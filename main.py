@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.0.1 / 11-feb-2023
+# ver. 0.9.0.2 / 11-feb-2023
 
 from itertools import permutations
 from math import ceil
