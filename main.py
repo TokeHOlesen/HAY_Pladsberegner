@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.0.2 / 11-feb-2023
+# ver. 0.9.0.3 / 13-feb-2023
 
 from itertools import permutations
 from math import ceil
@@ -365,7 +365,7 @@ def calculate_pallets():
                 # If there's room, transfers 120 pallets from the leftover pool
                 while this_truck_ldm_120[t] <= (max_truck_ldm - 40) and 120 in leftover_pallets:
                     buffer_120 += 1
-                    this_truck_ldm_120[t] += 4
+                    this_truck_ldm_120[t] += 40
                     leftover_pallets.remove(120)
                 number_of_120.append(buffer_120)
             else:
