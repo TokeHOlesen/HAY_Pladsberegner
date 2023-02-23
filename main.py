@@ -454,12 +454,14 @@ def calculate_pallets():
         # Calculates how many 17080 pallets there are on each truck
         number_of_170_170_170 = []
         for this_truck in trucks:
+            buffer = 0
             if (17080, 17080, 17080) in this_truck:
-                buffer = 0
                 for this_arrangement in this_truck:
                     if this_arrangement == (17080, 17080, 17080):
                         buffer += 3
-                number_of_170_170_170.append(buffer)
+            number_of_170_170_170.append(buffer)
+        print(len(number_of_170_170_170))
+        print(len(trucks))
 
         # Calculates how many 17080 pallets can fit on each truck
         room_for_17080 = 0
@@ -467,11 +469,12 @@ def calculate_pallets():
         for t in range(len(trucks) - 1):
             if truck_ldm(trucks[t]) <= max_truck_ldm - 80:
                 room_for_17080 += ((max_truck_ldm - truck_ldm(trucks[t])) // 80)
-                print(room_for_17080)
 
         # Splits 3x170x80 arrangements into individual pallets
         for t in range(len(trucks) - 1):
-            for n in range(len(trucks) - 1, t, - 1):
+            print(f"t: {t}")
+            for n in range(len(trucks) - 1, t, -1):
+                print(f"n: {n}")
                 while room_for_17080 > 0:
                     if number_of_170_170_170[n] >= 1:
                         trucks[n].remove((17080, 17080, 17080))
@@ -710,9 +713,6 @@ def calculate_pallets():
             truck_buffer_ldm.pop()
 
         trucks.append(truck_buffer)
-
-    for truck in trucks:
-        print(f"\n{truck}")
 
     # Space optimization:
     # If there's more than one truck, checks if anything can be moved back to a previous truck
