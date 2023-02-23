@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.0.3 / 13-feb-2023
+# ver. 0.9.1.0 / 23-feb-2023
 
 from itertools import permutations
 from math import ceil
@@ -33,6 +33,8 @@ color_145 = "#55ffff"
 color_17090 = "#ff5555"
 color_17080 = "#ff55ff"
 color_120 = "#ffff55"
+color_120114 = "#aa5500"
+color_120104 = "#00aaaa"
 
 # An "arrangement" is defined as a group of pallets that end in a straight line, resulting in no wasted space between
 # multiple arrangements. A set of arrangements that contains all pallets is defined as a "grouping".
@@ -49,7 +51,7 @@ permutable_arrangements = [
     (120, 120),
     (120, 120, 60, 60),
     (17090, 60),
-    (130, 120, 120)
+    (17080, 17080, 17080)
 ]
 
 # These will be appended to every permutation of permutable_arrangements in a fixed order.
@@ -58,11 +60,13 @@ non_permutable_arrangements = [
     (17080, 60),
     (145, 145, 145),
     (130, 130),
-    (17080, 17080, 17080),
+    (130, 120, 120),
+    (120114, 120114),
+    (120104, 120104),
     (60, 60, 60)
 ]
 
-# How much space each arrangement takes up (ldm * 10)
+# How much space each arrangement takes up (ldm * 100)
 arrangement_values = {
     (17090, 145, 145): 171,
     (17090, 17090, 130, 130, 130): 342,
@@ -71,14 +75,22 @@ arrangement_values = {
     (120, 120, 120): 120,
     (120, 120): 80,
     (145, 145, 145): 148,
-    (17080, 17080, 17080): 170,
+    (17080, 17080, 17080): 171,
     (130, 120, 120): 160,
     (17080, 60): 80,
     (17080, 17080, 120, 60): 170,
     (17080, 120, 120, 60, 60): 170,
     (60, 60, 60): 60,
     (120, 120, 60, 60): 120,
-    (120, 60, 60, 60, 60): 120
+    (120, 60, 60, 60, 60): 120,
+    (120114, 120114): 116,
+    (120104, 120104): 106,
+    (120114, 120104): 116,
+    (17080, 120114): 171,
+    (17080, 120104): 171,
+    120114: 114,
+    120104: 104,
+    17080: 79
 }
 
 # Counter for arrangements of a given type
@@ -97,7 +109,15 @@ arrangement_counter = {
     (17080, 120, 120, 60, 60): 0,
     (60, 60, 60): 0,
     (120, 120, 60, 60): 0,
-    (120, 60, 60, 60, 60): 0
+    (120, 60, 60, 60, 60): 0,
+    (120114, 120114): 0,
+    (120104, 120104): 0,
+    (120114, 120104): 0,
+    (17080, 120114): 0,
+    (17080, 120104): 0,
+    120114: 0,
+    120104: 0,
+    17080: 0
 }
 
 # Used for text output - self-explanatory
@@ -116,7 +136,15 @@ arrangement_formatted_output = {
     (17080, 120, 120, 60, 60): "170x80, 120x80, 120x80, 60x80, 60x80",
     (60, 60, 60): "60x80, 60x80, 60x80",
     (120, 120, 60, 60): "120x80, 120x80, 60x80, 60x80",
-    (120, 60, 60, 60, 60): "120x80, 60x80, 60x80, 60x80, 60x80"
+    (120, 60, 60, 60, 60): "120x80, 60x80, 60x80, 60x80, 60x80",
+    (120114, 120114): "120x114, 120x114",
+    (120104, 120104): "120x104, 120x104",
+    (120114, 120104): "120x114, 120x104",
+    (17080, 120114): "170x80, 120x114",
+    (17080, 120104): "170x80, 120x104",
+    120114: "120x114",
+    120104: "120x104",
+    17080: "170x80"
 }
 
 pallet_formatted_output = {
@@ -125,7 +153,9 @@ pallet_formatted_output = {
     145: "145x80",
     130: "130x115",
     17080: "170x80",
-    17090: "170x90"
+    17090: "170x90",
+    120114: "120x114",
+    120104: "120x104"
 }
 
 # How much space a single pallet of a given type takes up (ldm * 100)
@@ -135,7 +165,9 @@ pallet_values = {
     145: 50,
     130: 70,
     17080: 60,
-    17090: 80
+    17090: 80,
+    120114: 60,
+    120104: 60
 }
 
 # Counts loose pallets
@@ -145,7 +177,9 @@ pallet_counter = {
     145: 0,
     130: 0,
     17080: 0,
-    17090: 0
+    17090: 0,
+    120114: 0,
+    120104: 0
 }
 
 # The order in which arrangements will be shown on trucks
@@ -162,10 +196,18 @@ arrangement_order = [
     (120, 60, 60, 60, 60),
     (145, 145, 145),
     (130, 130),
+    (120114, 120114),
+    (120104, 120104),
     (17090, 60),
     (17080, 60),
     (60, 60, 60),
-    (130, 120, 120)
+    (130, 120, 120),
+    (120114, 120104),
+    (17080, 120114),
+    (17080, 120104),
+    120114,
+    120104,
+    17080
 ]
 
 
@@ -178,10 +220,10 @@ def move_focus(event):
     else:
         entry_focus = int(str(window.focus_get())[-1]) - 1
 
-    if entry_focus < 5:
+    if entry_focus < len(entry_boxes) - 1:
         entry_focus += 1
         entry_boxes[entry_focus].focus_set()
-    elif entry_focus == 5:
+    elif entry_focus == len(entry_boxes) - 1:
         entry_focus = 0
         start_button.focus_set()
 
@@ -404,6 +446,46 @@ def calculate_pallets():
         else:
             return True
 
+    # If there's at least 0.8 ldm left on a truck, splits 3x170x80 arrengements into individual pallets that are then
+    # redistributed among trucks. This is useful for HEE with large pallets and potential for waste
+    def rearrange_17080():
+        trucks_before_rearrangement = deepcopy(trucks)
+
+        # Calculates how many 17080 pallets there are on each truck
+        number_of_170_170_170 = []
+        for this_truck in trucks:
+            if (17080, 17080, 17080) in this_truck:
+                buffer = 0
+                for this_arrangement in this_truck:
+                    if this_arrangement == (17080, 17080, 17080):
+                        buffer += 3
+                number_of_170_170_170.append(buffer)
+
+        # Calculates how many 17080 pallets can fit on each truck
+        room_for_17080 = 0
+
+        for t in range(len(trucks) - 1):
+            if truck_ldm(trucks[t]) <= max_truck_ldm - 80:
+                room_for_17080 += ((max_truck_ldm - truck_ldm(trucks[t])) // 80)
+                print(room_for_17080)
+
+        # Splits 3x170x80 arrangements into individual pallets
+        for t in range(len(trucks) - 1):
+            for n in range(len(trucks) - 1, t, - 1):
+                while room_for_17080 > 0:
+                    if number_of_170_170_170[n] >= 1:
+                        trucks[n].remove((17080, 17080, 17080))
+                        trucks[-1].append(17080)
+                        trucks[-1].append(17080)
+                        trucks[-1].append(17080)
+                        room_for_17080 -= 3
+
+        # Resets optimization flag
+        if trucks_before_rearrangement == trucks:
+            return False
+        else:
+            return True
+
     # If any data from a previous calculation exists, resets everything except the contens of entry boxes, text output
     # box and the value of max_truck_ldm
     if trucks or ldm_of_leftovers:
@@ -416,7 +498,9 @@ def calculate_pallets():
         145,
         130,
         17080,
-        17090
+        17090,
+        120104,
+        120114
     ]
     pallet_input = []
 
@@ -561,6 +645,31 @@ def calculate_pallets():
                     final_grouping.append((120, 120))
                 final_grouping.append((130, 130))
 
+    # HEE only - turns leftovers of 120114, 120104 and 17080 pallets into makeshift arrangements
+
+    if leftover_pallets:
+        while 120114 in leftover_pallets and 120104 in leftover_pallets:
+            final_grouping.append((120114, 120104))
+            leftover_pallets.remove(120114)
+            leftover_pallets.remove(120104)
+        while 17080 in leftover_pallets and 120114 in leftover_pallets:
+            final_grouping.append((17080, 120114))
+            leftover_pallets.remove(17080)
+            leftover_pallets.remove(120114)
+        while 17080 in leftover_pallets and 120104 in leftover_pallets:
+            final_grouping.append((17080, 120104))
+            leftover_pallets.remove(17080)
+            leftover_pallets.remove(120104)
+        while 17080 in leftover_pallets:
+            final_grouping.append(17080)
+            leftover_pallets.remove(17080)
+        while 120114 in leftover_pallets:
+            final_grouping.append(120114)
+            leftover_pallets.remove(120114)
+        while 120104 in leftover_pallets:
+            final_grouping.append(120104)
+            leftover_pallets.remove(120104)
+
     status_label.config(text="Færdig.")
 
     # Calculates how many trucks are needed and what goes on which
@@ -572,21 +681,38 @@ def calculate_pallets():
     # Arrangements are added until ldm exceeds max_truck_ldm, the smallest arrangements are then subtracted
     # until it reaches 13.6 or less, then moves on to the next truck.
 
+    # Makes sure that makeshift leftovers arrangements consisting of single pallets are not used until the very end
+
+    def only_leftovers_remain(pool):
+        for this_arrangement in pool:
+            if this_arrangement not in (120114, 120104, 17080):
+                return False
+        return True
+
     while arrangements_not_yet_used:
         truck_buffer = []
         truck_buffer_ldm = []
 
         while sum(truck_buffer_ldm) < max_truck_ldm and arrangements_not_yet_used != []:
             for arrangement in arrangements_not_yet_used:
-                truck_buffer.append(arrangement)
-                truck_buffer_ldm.append(arrangement_values[arrangement])
-                arrangements_not_yet_used.remove(arrangement)
+                if not only_leftovers_remain(arrangements_not_yet_used):
+                    if arrangement not in (120114, 120104, 17080):
+                        truck_buffer.append(arrangement)
+                        truck_buffer_ldm.append(arrangement_values[arrangement])
+                        arrangements_not_yet_used.remove(arrangement)
+                else:
+                    truck_buffer.append(arrangement)
+                    truck_buffer_ldm.append(arrangement_values[arrangement])
+                    arrangements_not_yet_used.remove(arrangement)
 
         while sum(truck_buffer_ldm) > max_truck_ldm:
-            arrangements_not_yet_used.append(truck_buffer.pop())
+            arrangements_not_yet_used.insert(0, truck_buffer.pop())
             truck_buffer_ldm.pop()
 
         trucks.append(truck_buffer)
+
+    for truck in trucks:
+        print(f"\n{truck}")
 
     # Space optimization:
     # If there's more than one truck, checks if anything can be moved back to a previous truck
@@ -603,12 +729,13 @@ def calculate_pallets():
         if len(trucks) > 1:
             for i in range(1, len(trucks)):
                 for arrangement in trucks[i]:
-                    for x in range(i, 0, -1):
-                        if truck_ldm(trucks[i - x]) + arrangement_values[arrangement] <= max_truck_ldm:
-                            trucks[i - x].append(arrangement)
-                            trucks[i].remove(arrangement)
-                            optimization_possible = True
-                            break
+                    if arrangement not in (120114, 120104, 17080):
+                        for x in range(i, 0, -1):
+                            if truck_ldm(trucks[i - x]) + arrangement_values[arrangement] <= max_truck_ldm:
+                                trucks[i - x].append(arrangement)
+                                trucks[i].remove(arrangement)
+                                optimization_possible = True
+                                break
             # Swaps smaller arrangements for bigger ones to make optimal use of space
             for i in range(1, len(trucks)):
                 for x in range(i):
@@ -618,22 +745,23 @@ def calculate_pallets():
                             for high_ldm in ldm_descending_order(trucks[i]):
                                 if high_ldm - low_ldm <= space_available:
                                     if high_ldm > low_ldm:
-                                        optimization_possible = True
-                                        for high_arrangement in trucks[i]:
-                                            if arrangement_values[high_arrangement] == high_ldm:
-                                                trucks[i].remove(high_arrangement)
-                                                trucks[x].append(high_arrangement)
-                                                break
-                                        for low_arrangement in trucks[x]:
-                                            if arrangement_values[low_arrangement] == low_ldm:
-                                                trucks[x].remove(low_arrangement)
-                                                trucks[i].append(low_arrangement)
-                                                break
-                                        break
+                                        if high_ldm not in (114, 104, 79):
+                                            optimization_possible = True
+                                            for high_arrangement in trucks[i]:
+                                                if arrangement_values[high_arrangement] == high_ldm:
+                                                    trucks[i].remove(high_arrangement)
+                                                    trucks[x].append(high_arrangement)
+                                                    break
+                                            for low_arrangement in trucks[x]:
+                                                if arrangement_values[low_arrangement] == low_ldm:
+                                                    trucks[x].remove(low_arrangement)
+                                                    trucks[i].append(low_arrangement)
+                                                    break
+                                            break
 
         # If possible, rearranges 120 pallets into optimal groups
         # If anything has been rearranged, makes the optimization routine run again
-        optimization_possible = optimization_possible or rearrange_120()
+        optimization_possible = optimization_possible or rearrange_120() or rearrange_17080()
 
     # Sometimes after optimization, the last trucks end up empty
     # Checks and removes them if that's the case
@@ -685,7 +813,10 @@ def calculate_pallets():
 
         for arrangement in truck:
             arrangement_counter[arrangement] += 1
-            pallets_on_truck += len(arrangement)
+            if type(arrangement) is tuple:
+                pallets_on_truck += len(arrangement)
+            else:
+                pallets_on_truck += 1
 
         number_of_pallets_by_truck.append(pallets_on_truck)
         pallets_total += pallets_on_truck
@@ -976,6 +1107,70 @@ def draw_arrangement(arrangement, canvas):
         draw_description(31, "120x80 x 2")
         draw_description(46, "1,6 ldm")
         brush_position += 64 - 1
+    elif arrangement == (120114, 120114):
+        y2 = y + 46
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120114)
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=color_120114)
+        draw_bracket(y, y2)
+        draw_description(16, "120x114 x 2")
+        draw_description(31, "1,16 ldm")
+        brush_position += 46 - 1
+    elif arrangement == (120104, 120104):
+        y2 = y + 42
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120104)
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=color_120104)
+        draw_bracket(y, y2)
+        draw_description(15, "120x104 x 2")
+        draw_description(30, "1,06 ldm")
+        brush_position += 42 - 1
+    elif arrangement == (120114, 120104):
+        y2 = y + 46
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120114)
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 5, fill=color_120104)
+        draw_bracket(y, y2)
+        draw_description(9, "120x114 x 1")
+        draw_description(24, "120x104 x 1")
+        draw_description(39, "1,16 ldm")
+        brush_position += 46 - 1
+    elif arrangement == (17080, 120114):
+        y2 = y + 68
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
+        canvas.create_rectangle(32 + 2, y + 2, 80, y2 - 23, fill=color_120114)
+        draw_bracket(y, y2)
+        draw_description(9, "170x80 x 1")
+        draw_description(24, "120x114 x 1")
+        draw_description(39, "1,71 ldm")
+        brush_position += 68 - 1
+    elif arrangement == (17080, 120104):
+        y2 = y + 68
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
+        canvas.create_rectangle(32 + 2, y + 2, 80, y2 - 27, fill=color_120104)
+        draw_bracket(y, y2)
+        draw_description(9, "170x80 x 1")
+        draw_description(24, "120x104 x 1")
+        draw_description(39, "1,71 ldm")
+        brush_position += 68 - 1
+    elif arrangement == 17080:
+        y2 = y + 32
+        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=color_17080)
+        draw_bracket(y, y2)
+        draw_description(10, "170x80 x 1")
+        draw_description(25, "0,8 ldm")
+        brush_position += 32 - 1
+    elif arrangement == 120114:
+        y2 = y + 46
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120114)
+        draw_bracket(y, y2)
+        draw_description(16, "120x114 x 1")
+        draw_description(31, "1,16 ldm")
+        brush_position += 46 - 1
+    elif arrangement == 120104:
+        y2 = y + 42
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120104)
+        draw_bracket(y, y2)
+        draw_description(15, "120x104 x 1")
+        draw_description(30, "1,06 ldm")
+        brush_position += 42 - 1
 
 
 # Draws a representation of leftover pallets and their description on leftover_canvas
@@ -1030,6 +1225,18 @@ def draw_leftovers(pallet, canvas, mode):
             draw_number_of_leftovers(34, 17090)
             draw_description(28, "170x90", 17090)
             brush_position += 98 - 1
+        elif pallet == 120114:
+            y2 = y + 46
+            canvas.create_rectangle(12 + 2, y + 2, 60, y2 - 1, fill=color_120114)
+            draw_number_of_leftovers(23, 120114)
+            draw_description(18, "120x114", 120114)
+            brush_position += 76 - 1
+        elif pallet == 120104:
+            y2 = y + 42
+            canvas.create_rectangle(12 + 2, y + 2, 60, y2 - 1, fill=color_120104)
+            draw_number_of_leftovers(21, 120104)
+            draw_description(17, "120x104", 120104)
+            brush_position += 72 - 1
     elif mode == "none":
         canvas.create_text(48, 255, text="Ingen rest", font=("", "13"))
 
@@ -1037,7 +1244,7 @@ def draw_leftovers(pallet, canvas, mode):
 # GUI starts here
 
 window = Tk()
-window.title("HAY pladsberegner")
+window.title("HAY Pladsberegner 0.9.1.0")
 window.geometry("572x788")
 window.resizable(False, False)
 
@@ -1056,25 +1263,27 @@ entry_label_text = [
     "130x115:    ",
     "170x80:    ",
     "170x90:    ",
+    "120x104:    ",
+    "120x114:    "
 ]
 
 entry_labels = []
 
-for k in range(6):
+for k in range(8):
     entry_label = Label(entry_frame, width=10, anchor="e", text=entry_label_text[k])
     entry_labels.append(entry_label)
 
-for k in range(6):
+for k in range(8):
     entry_labels[k].grid(row=k, column=0, pady=2)
 
 entry_boxes = []
 
-for e in range(6):
+for e in range(8):
     entry_box = Entry(entry_frame, width=7, justify=RIGHT)
     entry_boxes.append(entry_box)
     entry_boxes[e].bind("<Return>", move_focus)
 
-for e in range(6):
+for e in range(8):
     entry_boxes[e].grid(row=e, column=1, pady=2)
 
 # Other GUI elements - self-explanatory
@@ -1122,11 +1331,11 @@ text_output.config(state=DISABLED)
 # Placement of GUI elements
 
 entry_frame.place(x=4, y=32)
-start_button.place(x=34, y=201)
-progress_bar.place(x=16, y=244)
-status_label.place(x=16, y=274)
-target_ldm_frame.place(x=4, y=320)
-reset_button.place(x=34, y=385)
+start_button.place(x=34, y=246)
+progress_bar.place(x=16, y=289)
+status_label.place(x=16, y=319)
+target_ldm_frame.place(x=4, y=365)
+reset_button.place(x=34, y=415)
 no_of_trucks_label.place(x=16, y=468)
 next_button.place(x=16, y=508)
 previous_button.place(x=16, y=548)
