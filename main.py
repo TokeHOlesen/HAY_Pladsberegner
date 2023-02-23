@@ -451,37 +451,55 @@ def calculate_pallets():
     def rearrange_17080():
         trucks_before_rearrangement = deepcopy(trucks)
 
-        # Calculates how many 17080 pallets there are on each truck
-        number_of_170_170_170 = []
-        for this_truck in trucks:
-            buffer = 0
-            if (17080, 17080, 17080) in this_truck:
-                for this_arrangement in this_truck:
-                    if this_arrangement == (17080, 17080, 17080):
-                        buffer += 3
-            number_of_170_170_170.append(buffer)
-        print(len(number_of_170_170_170))
-        print(len(trucks))
+        # Finds the index of the final truck with 17080 pallets
+        last_truck_with_17080 = 0
+        for t in range(len(trucks) - 1, 0, - 1):
+            if (17080, 17080, 17080) in trucks[t]:
+                last_truck_with_17080 = t
+                break
+            break
 
-        # Calculates how many 17080 pallets can fit on each truck
-        room_for_17080 = 0
+        # Finds out how many loose 17080 pallets can fit on each truck
+        # Saves results to a list with index corresponding to trucks[], but shorter by one element
+        room_for_17080 = []
 
         for t in range(len(trucks) - 1):
+            temp_room = 0
             if truck_ldm(trucks[t]) <= max_truck_ldm - 80:
-                room_for_17080 += ((max_truck_ldm - truck_ldm(trucks[t])) // 80)
+                temp_room = ((max_truck_ldm - truck_ldm(trucks[t])) // 80)
+            room_for_17080.append(temp_room)
 
-        # Splits 3x170x80 arrangements into individual pallets
+        # Finds how many 17080 pallets can fit in total
+        total_room_for_17080 = 0
+        for pallet_amount in room_for_17080:
+            total_room_for_17080 += pallet_amount
+
+        # Finds how many (17080, 17080, 17080) arrangements need to be broken down
+        no_of_17080_to_split = ceil(total_room_for_17080 / 3)
+
+        # Splits a specified amount of (17080, 17080, 17080) groups on the last truck that contains them up and adds
+        # the loose pallets to a common pool
+        loose_17080_pool = 0
+        if not last_truck_with_17080 == 0:
+            while (17080, 17080, 17080) in trucks[last_truck_with_17080] and not no_of_17080_to_split == 0:
+                trucks[last_truck_with_17080].remove((17080, 17080, 17080))
+                no_of_17080_to_split -= 1
+                loose_17080_pool += 3
+
+        # Moves the loose pallets from the pool to the trucks that have room for them
         for t in range(len(trucks) - 1):
-            print(f"t: {t}")
-            for n in range(len(trucks) - 1, t, -1):
-                print(f"n: {n}")
-                while room_for_17080 > 0:
-                    if number_of_170_170_170[n] >= 1:
-                        trucks[n].remove((17080, 17080, 17080))
-                        trucks[-1].append(17080)
-                        trucks[-1].append(17080)
-                        trucks[-1].append(17080)
-                        room_for_17080 -= 3
+            for n in range(room_for_17080[t]):
+                if not loose_17080_pool == 0:
+                    trucks[t].append(17080)
+                    loose_17080_pool -= 1
+
+        # If there are any remaining pallets in the loose pool, puts them on the last truck
+        if loose_17080_pool > 0:
+            for n in range(loose_17080_pool):
+                if not last_truck_with_17080 == 0:
+                    trucks[last_truck_with_17080].append(17080)
+                else:
+                    trucks[-1].append(17080)
 
         # Resets optimization flag
         if trucks_before_rearrangement == trucks:
@@ -729,7 +747,7 @@ def calculate_pallets():
         if len(trucks) > 1:
             for i in range(1, len(trucks)):
                 for arrangement in trucks[i]:
-                    if arrangement not in (120114, 120104, 17080):
+                    if arrangement not in (120114, 120104):
                         for x in range(i, 0, -1):
                             if truck_ldm(trucks[i - x]) + arrangement_values[arrangement] <= max_truck_ldm:
                                 trucks[i - x].append(arrangement)
