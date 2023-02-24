@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.0 / 23-feb-2023
+# ver. 0.9.1.2 / 24-feb-2023
 
 from itertools import permutations
 from math import ceil
@@ -51,16 +51,16 @@ permutable_arrangements = [
     (120, 120),
     (120, 120, 60, 60),
     (17090, 60),
-    (17080, 17080, 17080)
+    (130, 120, 120)
 ]
 
 # These will be appended to every permutation of permutable_arrangements in a fixed order.
 non_permutable_arrangements = [
+    (17080, 17080, 17080),
     (120, 60, 60, 60, 60),
     (17080, 60),
     (145, 145, 145),
     (130, 130),
-    (130, 120, 120),
     (120114, 120114),
     (120104, 120104),
     (60, 60, 60)
@@ -90,7 +90,7 @@ arrangement_values = {
     (17080, 120104): 171,
     120114: 114,
     120104: 104,
-    17080: 79
+    17080: 80
 }
 
 # Counter for arrangements of a given type
@@ -144,7 +144,7 @@ arrangement_formatted_output = {
     (17080, 120104): "170x80, 120x104",
     120114: "120x114",
     120104: "120x104",
-    17080: "170x80"
+    17080: "170x80 (på tværs)"
 }
 
 pallet_formatted_output = {
@@ -203,11 +203,11 @@ arrangement_order = [
     (60, 60, 60),
     (130, 120, 120),
     (120114, 120104),
+    17080,
     (17080, 120114),
     (17080, 120104),
     120114,
-    120104,
-    17080
+    120104
 ]
 
 
@@ -270,6 +270,11 @@ def reset_all(mode):
 
     entry_boxes[entry_focus].focus_set()
 
+    text_output.config(state=NORMAL)
+    text_output.delete('1.0', END)
+    text_output.insert("end", "Klar.")
+    text_output.config(state=DISABLED)
+
     if mode == "full":
         for entry in entry_boxes:
             entry.delete(0, END)
@@ -279,11 +284,6 @@ def reset_all(mode):
         entry_ldm.insert(0, str(max_truck_ldm / 100))
 
         status_label.config(text="Klar.")
-
-        text_output.config(state=NORMAL)
-        text_output.delete('1.0', END)
-        text_output.insert("end", "Klar.")
-        text_output.config(state=DISABLED)
 
 
 # Reads the contents of ldm_entry entry box and extracts a max_target_ldm value
@@ -312,7 +312,7 @@ def set_target_ldm(ldm_input):
 
 
 # Runs the main function in a separate thread
-# The thread is declared as a deamon to make sure it is terminated when the main window closes for any reason
+# The thread is declared as a daemon to make sure it is terminated when the main window closes for any reason
 def threaded_calculate_pallets(event):
     thread = Thread(target=calculate_pallets, daemon=True)
     thread.start()
@@ -447,7 +447,7 @@ def calculate_pallets():
             return True
 
     # If there's at least 0.8 ldm left on a truck, splits 3x170x80 arrengements into individual pallets that are then
-    # redistributed among trucks. This is useful for HEE with large pallets and potential for waste
+    # redistributed among trucks. This is useful for HEE with large pallets and potential for wasted space
     def rearrange_17080():
         trucks_before_rearrangement = deepcopy(trucks)
 
@@ -486,14 +486,14 @@ def calculate_pallets():
                 no_of_17080_to_split -= 1
                 loose_17080_pool += 3
 
-        # Moves the loose pallets from the pool to the trucks that have room for them
+        # Moves the loose pallets from the pool to their respective trucks
         for t in range(len(trucks) - 1):
             for n in range(room_for_17080[t]):
                 if not loose_17080_pool == 0:
                     trucks[t].append(17080)
                     loose_17080_pool -= 1
 
-        # If there are any remaining pallets in the loose pool, puts them on the last truck
+        # If there are any remaining pallets in the loose pool, puts them back on the truck they were taken from
         if loose_17080_pool > 0:
             for n in range(loose_17080_pool):
                 if not last_truck_with_17080 == 0:
@@ -763,7 +763,7 @@ def calculate_pallets():
                             for high_ldm in ldm_descending_order(trucks[i]):
                                 if high_ldm - low_ldm <= space_available:
                                     if high_ldm > low_ldm:
-                                        if high_ldm not in (114, 104, 79):
+                                        if high_ldm not in (114, 104):
                                             optimization_possible = True
                                             for high_arrangement in trucks[i]:
                                                 if arrangement_values[high_arrangement] == high_ldm:
@@ -777,7 +777,7 @@ def calculate_pallets():
                                                     break
                                             break
 
-        # If possible, rearranges 120 pallets into optimal groups
+        # If possible, rearranges 120 and 17080 pallets into optimal groups
         # If anything has been rearranged, makes the optimization routine run again
         optimization_possible = optimization_possible or rearrange_120() or rearrange_17080()
 
@@ -1155,18 +1155,18 @@ def draw_arrangement(arrangement, canvas):
         canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
         canvas.create_rectangle(32 + 2, y + 2, 80, y2 - 23, fill=color_120114)
         draw_bracket(y, y2)
-        draw_description(9, "170x80 x 1")
-        draw_description(24, "120x114 x 1")
-        draw_description(39, "1,71 ldm")
+        draw_description(18, "170x80 x 1")
+        draw_description(33, "120x114 x 1")
+        draw_description(48, "1,71 ldm")
         brush_position += 68 - 1
     elif arrangement == (17080, 120104):
         y2 = y + 68
         canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
         canvas.create_rectangle(32 + 2, y + 2, 80, y2 - 27, fill=color_120104)
         draw_bracket(y, y2)
-        draw_description(9, "170x80 x 1")
-        draw_description(24, "120x104 x 1")
-        draw_description(39, "1,71 ldm")
+        draw_description(18, "170x80 x 1")
+        draw_description(33, "120x104 x 1")
+        draw_description(48, "1,71 ldm")
         brush_position += 68 - 1
     elif arrangement == 17080:
         y2 = y + 32
@@ -1352,8 +1352,8 @@ entry_frame.place(x=4, y=32)
 start_button.place(x=34, y=246)
 progress_bar.place(x=16, y=289)
 status_label.place(x=16, y=319)
-target_ldm_frame.place(x=4, y=365)
-reset_button.place(x=34, y=415)
+target_ldm_frame.place(x=4, y=355)
+reset_button.place(x=34, y=405)
 no_of_trucks_label.place(x=16, y=468)
 next_button.place(x=16, y=508)
 previous_button.place(x=16, y=548)
