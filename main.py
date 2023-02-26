@@ -1,16 +1,15 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.2 / 24-feb-2023
+# ver. 0.9.1.3 / 26-feb-2023
 
 from itertools import permutations
 from math import ceil
 from copy import deepcopy
 from tkinter import *
-from tkinter import ttk
-from tkinter import scrolledtext
-from tkinter import messagebox
+from tkinter import ttk, scrolledtext, messagebox
+from tkinter.filedialog import asksaveasfile
 from functools import partial
 from threading import Thread
-from os import path
+from os import path, startfile, remove
 
 # Largest load allowed on a truck (ldm * 100)
 # 1350 is optimal, 1360 is risky, 1340 and less is safe but potentially wasteful
@@ -275,9 +274,15 @@ def reset_all(mode):
     text_output.insert("end", "Klar.")
     text_output.config(state=DISABLED)
 
+    copy_text_button.config(state=DISABLED)
+    print_text_button.config(state=DISABLED)
+    save_text_button.config(state=DISABLED)
+
     if mode == "full":
         for entry in entry_boxes:
             entry.delete(0, END)
+
+        reset_button.config(state=DISABLED)
 
         max_truck_ldm = 1350
         entry_ldm.delete(0, END)
@@ -540,6 +545,7 @@ def calculate_pallets():
     set_target_ldm(entry_ldm.get())
 
     # Data processing begins here
+    start_button.config(state=DISABLED)
     text_output.config(state=NORMAL)
 
     text_output.insert("end", "\nStarter op...")
@@ -898,6 +904,10 @@ def calculate_pallets():
     if len(trucks) > 1:
         next_button.config(state=NORMAL)
 
+    copy_text_button.config(state=NORMAL)
+    print_text_button.config(state=NORMAL)
+    save_text_button.config(state=NORMAL)
+
     if leftover_pallets:
         brush_position = 20
         unique_leftover_pallets = [*set(leftover_pallets)]
@@ -913,6 +923,8 @@ def calculate_pallets():
     if number_of_pallets_by_truck and ldm_by_truck:
         label_pallets_ldm.config(text=f"{number_of_pallets_by_truck[0]} pll, {round(ldm_by_truck[0] / 100, 1)} ldm")
 
+    start_button.config(state=NORMAL)
+    reset_button.config(state=NORMAL)
     entry_boxes[0].focus_set()
 
 
@@ -1259,11 +1271,35 @@ def draw_leftovers(pallet, canvas, mode):
         canvas.create_text(48, 255, text="Ingen rest", font=("", "13"))
 
 
+def copy_text_output():
+    window.clipboard_clear()
+    window.clipboard_append(text_output.get(6.0, "end-10c"))
+    window.update()
+
+
+def print_text_output():
+    if path.isfile("HAY Pladsberegner.txt"):
+        remove("HAY Pladsberegner.txt")
+
+    temp_text_file = open("HAY Pladsberegner.txt", "x")
+    temp_text_file.write(text_output.get(6.0, "end-10c"))
+    temp_text_file.close()
+    startfile(temp_text_file.name, "print")
+
+
+def save_text_output():
+    text_file = asksaveasfile(defaultextension=".txt", filetypes=[("Tekstdokumenter", "*.txt"), ("Alle filer", "*.*")])
+    if text_file is None:
+        return
+    with open(text_file.name, "w") as t_f:
+        t_f.write(text_output.get(6.0, "end-10c"))
+
+
 # GUI starts here
 
 window = Tk()
-window.title("HAY Pladsberegner 0.9.1.0")
-window.geometry("572x788")
+window.title("HAY Pladsberegner 0.9.1.3")
+window.geometry("572x820")
 window.resizable(False, False)
 
 if path.isfile("truck_ico.ico"):
@@ -1322,7 +1358,7 @@ entry_ldm = Entry(target_ldm_frame, width=7, justify=RIGHT)
 entry_ldm.insert(0, str(max_truck_ldm / 100))
 entry_ldm.grid(row=0, column=1, pady=2)
 
-reset_button = Button(window, text="Nulstil alt", width=10, command=partial(reset_all, "full"))
+reset_button = Button(window, text="Nulstil alt", width=10, command=partial(reset_all, "full"), state=DISABLED)
 reset_button.bind("<Return>", lambda event: reset_all("full"))
 
 no_of_trucks_label = Label(window, text=f"Biler i alt: 0")
@@ -1346,6 +1382,10 @@ text_output = scrolledtext.ScrolledText(window, width=74, height=11, font=("Cour
 text_output.insert("end", "Klar.")
 text_output.config(state=DISABLED)
 
+copy_text_button = Button(window, text="Kopiér", width=10, state=DISABLED, command=copy_text_output)
+print_text_button = Button(window, text="Print", width=10, state=DISABLED, command=print_text_output)
+save_text_button = Button(window, text="Gem", width=10, state=DISABLED, command=save_text_output)
+
 # Placement of GUI elements
 
 entry_frame.place(x=4, y=32)
@@ -1366,6 +1406,10 @@ label_pallets_ldm.place(x=148, y=575)
 label_leftovers_ldm.place(x=392, y=575)
 
 text_output.place(x=16, y=602)
+
+copy_text_button.place(x=16, y=782)
+print_text_button.place(x=108, y=782)
+save_text_button.place(x=200, y=782)
 
 # Draws empty truck rectangles
 draw_truck_rectangle(truck_canvas)
