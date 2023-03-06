@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.3 / 26-feb-2023
+# ver. 0.9.1.4 / 28-feb-2023
 
 from itertools import permutations
 from math import ceil
@@ -1298,8 +1298,8 @@ def save_text_output():
 # GUI starts here
 
 window = Tk()
-window.title("HAY Pladsberegner 0.9.1.3")
-window.geometry("572x820")
+window.title("HAY Pladsberegner 0.9.1.4")
+window.geometry("572x820+256+64")
 window.resizable(False, False)
 
 if path.isfile("truck_ico.ico"):
