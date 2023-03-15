@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.4 / 28-feb-2023
+# ver. 0.9.1.5 / 15-mar-2023
 
 from itertools import permutations
 from math import ceil
@@ -1295,12 +1295,19 @@ def save_text_output():
         t_f.write(text_output.get(6.0, "end-10c"))
 
 
+def ask_if_really_quit():
+    quit_response = messagebox.askyesno("HAY Pladsberegner", "Skal programmet lukkes?")
+    if quit_response:
+        window.destroy()
+
+
 # GUI starts here
 
 window = Tk()
-window.title("HAY Pladsberegner 0.9.1.4")
+window.title("HAY Pladsberegner 0.9.1.5")
 window.geometry("572x820+256+64")
 window.resizable(False, False)
+window.protocol('WM_DELETE_WINDOW', ask_if_really_quit)
 
 if path.isfile("truck_ico.ico"):
     window.iconbitmap("truck_ico.ico")
