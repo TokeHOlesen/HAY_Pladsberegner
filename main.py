@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.5 / 15-mar-2023
+# ver. 0.9.1.6 / 20-apr-2023
 
 from itertools import permutations
 from math import ceil
@@ -14,7 +14,7 @@ from os import path, startfile, remove
 # Largest load allowed on a truck (ldm * 100)
 # 1350 is optimal, 1360 is risky, 1340 and less is safe but potentially wasteful
 # This value can be changed by the user
-max_truck_ldm = 1350
+max_truck_ldm = 1320
 
 trucks = []
 truck_to_draw = 0
@@ -284,7 +284,7 @@ def reset_all(mode):
 
         reset_button.config(state=DISABLED)
 
-        max_truck_ldm = 1350
+        max_truck_ldm = 1320
         entry_ldm.delete(0, END)
         entry_ldm.insert(0, str(max_truck_ldm / 100))
 
@@ -311,7 +311,7 @@ def set_target_ldm(ldm_input):
             text_output.insert("end", "\nMax ldm lavere end tilladt, rettes til 3,5.")
             text_output.config(state=DISABLED)
     else:
-        max_truck_ldm = 1350
+        max_truck_ldm = 1320
     entry_ldm.delete(0, END)
     entry_ldm.insert(0, str(max_truck_ldm / 100))
 
@@ -1304,7 +1304,7 @@ def ask_if_really_quit():
 # GUI starts here
 
 window = Tk()
-window.title("HAY Pladsberegner 0.9.1.5")
+window.title("HAY Pladsberegner 0.9.1.6")
 window.geometry("572x820+256+64")
 window.resizable(False, False)
 window.protocol('WM_DELETE_WINDOW', ask_if_really_quit)
