@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.7 / 26-apr-2023
+# ver. 0.9.1.8 / 25-jul-2023
 
 from itertools import permutations
 from math import ceil
@@ -212,7 +212,7 @@ arrangement_order = [
 
 
 # Moves focus to the next entry box or the Start button (runs when Enter is pressed)
-def move_focus(event):
+def move_focus(key):
     global entry_focus
 
     if str(window.focus_get()) == ".!frame.!entry":
@@ -220,12 +220,17 @@ def move_focus(event):
     else:
         entry_focus = int(str(window.focus_get())[-1]) - 1
 
-    if entry_focus < len(entry_boxes) - 1:
-        entry_focus += 1
-        entry_boxes[entry_focus].focus_set()
-    elif entry_focus == len(entry_boxes) - 1:
-        entry_focus = 0
-        start_button.focus_set()
+    if key == "Return" or key == "DownArrow":
+        if entry_focus < len(entry_boxes) - 1:
+            entry_focus += 1
+            entry_boxes[entry_focus].focus_set()
+        elif entry_focus == len(entry_boxes) - 1 and key == "Return":
+            entry_focus = 0
+            start_button.focus_set()
+    elif key == "UpArrow":
+        if entry_focus > 0:
+            entry_focus -= 1
+            entry_boxes[entry_focus].focus_set()
 
 
 # Resets global values
@@ -1305,7 +1310,7 @@ def ask_if_really_quit():
 # GUI starts here
 
 window = Tk()
-window.title("HAY Pladsberegner 0.9.1.7")
+window.title("HAY Pladsberegner 0.9.1.8")
 window.geometry("572x820+256+64")
 window.resizable(False, False)
 window.protocol('WM_DELETE_WINDOW', ask_if_really_quit)
@@ -1343,7 +1348,9 @@ entry_boxes = []
 for e in range(8):
     entry_box = Entry(entry_frame, width=7, justify=RIGHT)
     entry_boxes.append(entry_box)
-    entry_boxes[e].bind("<Return>", move_focus)
+    entry_boxes[e].bind("<Return>", lambda event: move_focus("Return"))
+    entry_boxes[e].bind("<Up>", lambda event: move_focus("UpArrow"))
+    entry_boxes[e].bind("<Down>", lambda event: move_focus("DownArrow"))
 
 for e in range(8):
     entry_boxes[e].grid(row=e, column=1, pady=2)
