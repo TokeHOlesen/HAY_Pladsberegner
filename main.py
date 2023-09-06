@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.8 / 25-jul-2023
+# ver. 0.9.1.9 / 06-sep-2023
 
 from itertools import permutations
 from math import ceil
@@ -535,16 +535,26 @@ def calculate_pallets():
         120114
     ]
     pallet_input = []
+    show_empty_warning = True
 
     for b in range(len(entry_boxes)):
-        if entry_boxes[b].get().isnumeric() and int(entry_boxes[b].get()) > 0:
-            for c in range(int(entry_boxes[b].get())):
-                pallet_input.append(pallet_types[b])
+        if not entry_boxes[b].get() == "":
+            if entry_boxes[b].get().isnumeric() and int(entry_boxes[b].get()) > 0:
+                for c in range(int(entry_boxes[b].get())):
+                    pallet_input.append(pallet_types[b])
+            else:
+                pallet_input = []
+                show_empty_warning = False
+                break
 
     # Displays a warning messagebox if entry boxes are empty or not filled out properly
+    # If show_empty_warning is False, shows a message that the data is incorrect instead
     if not pallet_input:
-        messagebox.showwarning("Mangler input", "Indtast antal paller.")
-        reset_all("full")
+        if show_empty_warning:
+            messagebox.showwarning("Mangler input", "Indtast antal paller.")
+        else:
+            messagebox.showwarning("Fejl", "Ugyldigt antal.")
+        reset_all("partial")
         return
 
     # Sets max ldm per truck
@@ -1310,7 +1320,7 @@ def ask_if_really_quit():
 # GUI starts here
 
 window = Tk()
-window.title("HAY Pladsberegner 0.9.1.8")
+window.title("HAY Pladsberegner 0.9.1.9")
 window.geometry("572x820+256+64")
 window.resizable(False, False)
 window.protocol('WM_DELETE_WINDOW', ask_if_really_quit)
