@@ -1,5 +1,5 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.9 / 06-sep-2023
+# ver. 0.9.1.9b / 06-sep-2023
 
 from itertools import permutations
 from math import ceil
@@ -12,7 +12,7 @@ from threading import Thread
 from os import path, startfile, remove
 
 # Largest load allowed on a truck (ldm * 100)
-# 1350 is optimal, 1360 is risky, 1340 and less is safe but potentially wasteful
+# 1360 is risky, 1330 is optimal, anything below is safe but potentially wasteful
 # This value can be changed by the user
 DEFAULT_MAX_TRUCK_LDM = 1330
 max_truck_ldm = DEFAULT_MAX_TRUCK_LDM
@@ -539,7 +539,7 @@ def calculate_pallets():
 
     for b in range(len(entry_boxes)):
         if not entry_boxes[b].get() == "":
-            if entry_boxes[b].get().isnumeric() and int(entry_boxes[b].get()) > 0:
+            if entry_boxes[b].get().isnumeric() and int(entry_boxes[b].get()) >= 0:
                 for c in range(int(entry_boxes[b].get())):
                     pallet_input.append(pallet_types[b])
             else:
@@ -1320,7 +1320,7 @@ def ask_if_really_quit():
 # GUI starts here
 
 window = Tk()
-window.title("HAY Pladsberegner 0.9.1.9")
+window.title("HAY Pladsberegner 0.9.1.9b")
 window.geometry("572x820+256+64")
 window.resizable(False, False)
 window.protocol('WM_DELETE_WINDOW', ask_if_really_quit)
