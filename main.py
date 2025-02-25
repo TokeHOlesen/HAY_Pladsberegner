@@ -11,10 +11,8 @@ from functools import partial
 from threading import Thread
 from os import path, startfile, remove
 
-# Largest load allowed on a truck (ldm * 100)
-# 1360 is risky, 1330 is optimal, anything below is safe but potentially wasteful
-# This value can be changed by the user
-DEFAULT_MAX_TRUCK_LDM = 1330
+from constants import *
+
 max_truck_ldm = DEFAULT_MAX_TRUCK_LDM
 
 trucks = []
@@ -26,72 +24,10 @@ ldm_by_truck = []
 ldm_of_leftovers = 0
 entry_focus = 0
 
-# Pallet colours
-color_60 = "#5555ff"
-color_130 = "#55ff55"
-color_145 = "#55ffff"
-color_17090 = "#ff5555"
-color_17080 = "#ff55ff"
-color_120 = "#ffff55"
-color_120114 = "#aa5500"
-color_120104 = "#00aaaa"
-
 # An "arrangement" is defined as a group of pallets that end in a straight line, resulting in no wasted space between
 # multiple arrangements. A set of arrangements that contains all pallets is defined as a "grouping".
 # Pallets in a grouping that don't fit into any arrangement are defined as "leftovers".
 # The grouping determined to be optimal (the least used space and the fewest leftovers) will be broken up into "trucks".
-
-# A list will be created with all possible permutations of these arrangements, with the length of n!, where n is the
-# number of elements of permutable_arrangements. 8 elements is optimal, 9 is the practical maximum.
-permutable_arrangements = [
-    (17090, 145, 145),
-    (17090, 17090, 130, 130, 130),
-    (17080, 17080, 120, 60),
-    (17080, 120, 120, 60, 60),
-    (120, 120),
-    (120, 120, 60, 60),
-    (17090, 60),
-    (130, 120, 120)
-]
-
-# These will be appended to every permutation of permutable_arrangements in a fixed order.
-non_permutable_arrangements = [
-    (17080, 17080, 17080),
-    (120, 60, 60, 60, 60),
-    (17080, 60),
-    (145, 145, 145),
-    (130, 130),
-    (120114, 120114),
-    (120104, 120104),
-    (60, 60, 60)
-]
-
-# How much space each arrangement takes up (ldm * 100)
-arrangement_values = {
-    (17090, 145, 145): 171,
-    (17090, 17090, 130, 130, 130): 342,
-    (17090, 60): 90,
-    (130, 130): 140,
-    (120, 120, 120): 120,
-    (120, 120): 80,
-    (145, 145, 145): 147,
-    (17080, 17080, 17080): 171,
-    (130, 120, 120): 160,
-    (17080, 60): 80,
-    (17080, 17080, 120, 60): 170,
-    (17080, 120, 120, 60, 60): 170,
-    (60, 60, 60): 60,
-    (120, 120, 60, 60): 120,
-    (120, 60, 60, 60, 60): 120,
-    (120114, 120114): 116,
-    (120104, 120104): 106,
-    (120114, 120104): 116,
-    (17080, 120114): 171,
-    (17080, 120104): 171,
-    120114: 114,
-    120104: 104,
-    17080: 80
-}
 
 # Counter for arrangements of a given type
 arrangement_counter = {
@@ -120,56 +56,6 @@ arrangement_counter = {
     17080: 0
 }
 
-# Used for text output - self-explanatory
-arrangement_formatted_output = {
-    (17090, 145, 145): "170x90, 145x80, 145x80",
-    (17090, 17090, 130, 130, 130): "170x90, 170x90, 130x115, 130x115, 130x115",
-    (17090, 60): "170x90, 60x80 (på tværs)",
-    (130, 130): "130x115, 130x115",
-    (120, 120, 120): "120x80, 120x80, 120x80",
-    (120, 120): "120x80, 120x80 (på tværs)",
-    (145, 145, 145): "145x80, 145x80, 145x80",
-    (17080, 17080, 17080): "170x80, 170x80, 170x80",
-    (130, 120, 120): "130x115, 120x80, 120x80",
-    (17080, 60): "170x80, 60x80 (på tværs)",
-    (17080, 17080, 120, 60): "170x80, 170x80, 120x80, 60x80",
-    (17080, 120, 120, 60, 60): "170x80, 120x80, 120x80, 60x80, 60x80",
-    (60, 60, 60): "60x80, 60x80, 60x80",
-    (120, 120, 60, 60): "120x80, 120x80, 60x80, 60x80",
-    (120, 60, 60, 60, 60): "120x80, 60x80, 60x80, 60x80, 60x80",
-    (120114, 120114): "120x114, 120x114",
-    (120104, 120104): "120x104, 120x104",
-    (120114, 120104): "120x114, 120x104",
-    (17080, 120114): "170x80, 120x114",
-    (17080, 120104): "170x80, 120x104",
-    120114: "120x114",
-    120104: "120x104",
-    17080: "170x80 (på tværs)"
-}
-
-pallet_formatted_output = {
-    60: "60x80",
-    120: "120x80",
-    145: "145x80",
-    130: "130x115",
-    17080: "170x80",
-    17090: "170x90",
-    120114: "120x114",
-    120104: "120x104"
-}
-
-# How much space a single pallet of a given type takes up (ldm * 100)
-pallet_values = {
-    60: 20,
-    120: 40,
-    145: 50,
-    130: 70,
-    17080: 60,
-    17090: 80,
-    120114: 60,
-    120104: 60
-}
-
 # Counts loose pallets
 pallet_counter = {
     60: 0,
@@ -181,34 +67,6 @@ pallet_counter = {
     120114: 0,
     120104: 0
 }
-
-# The order in which arrangements will be shown on trucks
-
-arrangement_order = [
-    (17080, 17080, 17080),
-    (17080, 17080, 120, 60),
-    (17080, 120, 120, 60, 60),
-    (17090, 145, 145),
-    (17090, 17090, 130, 130, 130),
-    (120, 120, 120),
-    (120, 120),
-    (120, 120, 60, 60),
-    (120, 60, 60, 60, 60),
-    (145, 145, 145),
-    (130, 130),
-    (120114, 120114),
-    (120104, 120104),
-    (17090, 60),
-    (17080, 60),
-    (60, 60, 60),
-    (130, 120, 120),
-    (120114, 120104),
-    17080,
-    (17080, 120114),
-    (17080, 120104),
-    120114,
-    120104
-]
 
 
 # Moves focus to the next entry box or the Start button (runs when Enter is pressed)
@@ -353,14 +211,14 @@ def calculate_pallets():
         leftovers_ldm_result = 0
         for remaining_pallet in leftover_pallets_in_each_grouping[this_index]:
             remaining_pallet: int
-            leftovers_ldm_result += pallet_values[remaining_pallet]
+            leftovers_ldm_result += PALLET_VALUES[remaining_pallet]
         return leftovers_ldm_result
 
     # Calculates ldm for a given grouping (sum of pallets in arrangements and leftovers)
     def total_ldm(this_index):
         total_ldm_result = 0
         for checked_grouping in all_possible_groupings[this_index]:
-            total_ldm_result += arrangement_values[checked_grouping]
+            total_ldm_result += ARRANGEMENT_VALUES[checked_grouping]
         total_ldm_result += leftovers_ldm(this_index)
         return total_ldm_result
 
@@ -368,14 +226,14 @@ def calculate_pallets():
     def truck_ldm(this_truck):
         truck_ldm_result = 0
         for this_grouping in this_truck:
-            truck_ldm_result += arrangement_values[this_grouping]
+            truck_ldm_result += ARRANGEMENT_VALUES[this_grouping]
         return truck_ldm_result
 
     # Returns a list of the ldm values of all arrangements on a given truck, in ascending order
     def ldm_ascending_order(this_truck):
         ldm_ascending_list = []
         for this_grouping in this_truck:
-            ldm_ascending_list.append(arrangement_values[this_grouping])
+            ldm_ascending_list.append(ARRANGEMENT_VALUES[this_grouping])
         ldm_ascending_list.sort()
         return ldm_ascending_list
 
@@ -383,7 +241,7 @@ def calculate_pallets():
     def ldm_descending_order(this_truck):
         ldm_descending_list = []
         for this_grouping in this_truck:
-            ldm_descending_list.append(arrangement_values[this_grouping])
+            ldm_descending_list.append(ARRANGEMENT_VALUES[this_grouping])
         ldm_descending_list.sort()
         ldm_descending_list.reverse()
         return ldm_descending_list
@@ -391,7 +249,7 @@ def calculate_pallets():
     # Sorts arrangements on a given truck according to the order of items in arrangement_order
     def sort_truck(truck_index):
         sorted_truck = []
-        for current_arrangement in arrangement_order:
+        for current_arrangement in ARRANGEMENT_ORDER:
             while current_arrangement in trucks[truck_index]:
                 sorted_truck.append(current_arrangement)
                 trucks[truck_index].remove(current_arrangement)
@@ -568,7 +426,7 @@ def calculate_pallets():
     status_label.config(text="Starter op...")
 
     # Calculates all possible permutations of items in permutable_arrangements
-    all_permutations = list(permutations(permutable_arrangements, len(permutable_arrangements)))
+    all_permutations = list(permutations(PERMUTABLE_ARRANGEMENTS, len(PERMUTABLE_ARRANGEMENTS)))
 
     # Combines all permutations of permutable_arrangements with non_permutable_arrangements (fixed order),
     # for a full list of possible permutations of arrangements
@@ -579,7 +437,7 @@ def calculate_pallets():
         this_permutation = []
         for permutable_arrangement in all_permutations[i]:
             this_permutation.append(permutable_arrangement)
-        for non_permutable_arrangement in non_permutable_arrangements:
+        for non_permutable_arrangement in NON_PERMUTABLE_ARRANGEMENTS:
             this_permutation.append(non_permutable_arrangement)
         possible_arrangements.append(this_permutation)
 
@@ -642,7 +500,7 @@ def calculate_pallets():
     for pallets_remaining in leftover_pallets_in_each_grouping:
         remaining_ldm = 0
         for pallet in pallets_remaining:
-            remaining_ldm += pallet_values[pallet]
+            remaining_ldm += PALLET_VALUES[pallet]
         if remaining_ldm < lowest_remaining_ldm:
             lowest_remaining_ldm = remaining_ldm
 
@@ -741,11 +599,11 @@ def calculate_pallets():
                 if not only_leftovers_remain(arrangements_not_yet_used):
                     if arrangement not in (120114, 120104, 17080):
                         truck_buffer.append(arrangement)
-                        truck_buffer_ldm.append(arrangement_values[arrangement])
+                        truck_buffer_ldm.append(ARRANGEMENT_VALUES[arrangement])
                         arrangements_not_yet_used.remove(arrangement)
                 else:
                     truck_buffer.append(arrangement)
-                    truck_buffer_ldm.append(arrangement_values[arrangement])
+                    truck_buffer_ldm.append(ARRANGEMENT_VALUES[arrangement])
                     arrangements_not_yet_used.remove(arrangement)
 
         while sum(truck_buffer_ldm) > max_truck_ldm:
@@ -771,7 +629,7 @@ def calculate_pallets():
                 for arrangement in trucks[i]:
                     if arrangement not in (120114, 120104):
                         for x in range(i, 0, -1):
-                            if truck_ldm(trucks[i - x]) + arrangement_values[arrangement] <= max_truck_ldm:
+                            if truck_ldm(trucks[i - x]) + ARRANGEMENT_VALUES[arrangement] <= max_truck_ldm:
                                 trucks[i - x].append(arrangement)
                                 trucks[i].remove(arrangement)
                                 optimization_possible = True
@@ -788,12 +646,12 @@ def calculate_pallets():
                                         if high_ldm not in (114, 104):
                                             optimization_possible = True
                                             for high_arrangement in trucks[i]:
-                                                if arrangement_values[high_arrangement] == high_ldm:
+                                                if ARRANGEMENT_VALUES[high_arrangement] == high_ldm:
                                                     trucks[i].remove(high_arrangement)
                                                     trucks[x].append(high_arrangement)
                                                     break
                                             for low_arrangement in trucks[x]:
-                                                if arrangement_values[low_arrangement] == low_ldm:
+                                                if ARRANGEMENT_VALUES[low_arrangement] == low_ldm:
                                                     trucks[x].remove(low_arrangement)
                                                     trucks[i].append(low_arrangement)
                                                     break
@@ -819,7 +677,7 @@ def calculate_pallets():
     if leftover_pallets:
         for pallet in pallet_counter:
             if pallet_counter[pallet] != 0:
-                ldm_of_leftovers += pallet_values[pallet] * pallet_counter[pallet]
+                ldm_of_leftovers += PALLET_VALUES[pallet] * pallet_counter[pallet]
 
     # Increases the number of trucks needed if there's not enough room for leftovers after
     # the groupable items have been assigned to their trucks.
@@ -868,10 +726,10 @@ def calculate_pallets():
             current_truck_ldm = 0
             for arrangement in arrangement_counter:
                 if arrangement_counter[arrangement] != 0:
-                    this_truck_ldm = arrangement_values[arrangement] * arrangement_counter[arrangement]
+                    this_truck_ldm = ARRANGEMENT_VALUES[arrangement] * arrangement_counter[arrangement]
                     text_output.insert(
-                        "end", f"\n{arrangement_formatted_output[arrangement]} x {arrangement_counter[arrangement]} "
-                               f"({arrangement_values[arrangement] / 100} * {arrangement_counter[arrangement]} = "
+                        "end", f"\n{ARRANGEMENT_FORMATTED_OUTPUT[arrangement]} x {arrangement_counter[arrangement]} "
+                               f"({ARRANGEMENT_VALUES[arrangement] / 100} * {arrangement_counter[arrangement]} = "
                                f"{this_truck_ldm / 100} ldm)")
                     current_truck_ldm += this_truck_ldm
 
@@ -884,7 +742,7 @@ def calculate_pallets():
     if leftover_pallets:
         for pallet in pallet_counter:
             if pallet_counter[pallet] != 0:
-                text_output.insert("end", f"\n{pallet_formatted_output[pallet]}: x {pallet_counter[pallet]}")
+                text_output.insert("end", f"\n{PALLET_FORMATTED_OUTPUT[pallet]}: x {pallet_counter[pallet]}")
         text_output.insert("end", f"\nI alt rester: {ldm_of_leftovers / 100} ldm.")
         pallets_total += len(leftover_pallets)
     else:
@@ -1008,60 +866,60 @@ def draw_arrangement(arrangement, canvas):
 
     if arrangement == (120, 120, 120):
         y2 = y + 48
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_120)
-        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=color_120)
-        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 1, fill=color_120)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["120"])
         draw_bracket(y, y2)
         draw_description(16, "120x80 x 3")
         draw_description(31, "1,2 ldm")
         brush_position += 48 - 1
     elif arrangement == (120, 120):
         y2 = y + 32
-        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120)
-        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=color_120)
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["120"])
         draw_bracket(y, y2)
         draw_description(17, "120x80 x 2, 0,8 ldm")
         brush_position += 32 - 1
     elif arrangement == (145, 145, 145):
         y2 = y + 59
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_145)
-        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=color_145)
-        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 1, fill=color_145)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["145"])
+        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=PALLET_COLORS["145"])
+        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["145"])
         draw_bracket(y, y2)
         draw_description(22, "145x80 x 3")
         draw_description(37, "1,5 ldm")
         brush_position += 59 - 1
     elif arrangement == (17080, 17080, 17080):
         y2 = y + 68
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
-        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=color_17080)
-        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 1, fill=color_17080)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["17080"])
+        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=PALLET_COLORS["17080"])
+        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["17080"])
         draw_bracket(y, y2)
         draw_description(24, "170x80 x 3")
         draw_description(39, "1,7 ldm")
         brush_position += 68 - 1
     elif arrangement == (130, 130):
         y2 = y + 56
-        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_130)
-        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=color_130)
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["130"])
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["130"])
         draw_bracket(y, y2)
         draw_description(20, "130x115 x 2")
         draw_description(35, "1,4 ldm")
         brush_position += 56 - 1
     elif arrangement == (60, 60, 60):
         y2 = y + 24
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_60)
-        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=color_60)
-        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 1, fill=color_60)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["60"])
+        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=PALLET_COLORS["60"])
+        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["60"])
         draw_bracket(y, y2)
         draw_description(13, "60x80 x 3, 0,6 ldm")
         brush_position += 24 - 1
     elif arrangement == (120, 120, 60, 60):
         y2 = y + 48
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_120)
-        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=color_120)
-        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 24 - 1, fill=color_60)
-        canvas.create_rectangle(64 + 2, y + 24 + 1, 96, y2 - 1, fill=color_60)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 24 - 1, fill=PALLET_COLORS["60"])
+        canvas.create_rectangle(64 + 2, y + 24 + 1, 96, y2 - 1, fill=PALLET_COLORS["60"])
         draw_bracket(y, y2)
         draw_description(10, "120x80 x 2")
         draw_description(25, "60x80 x 2")
@@ -1069,11 +927,11 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 48 - 1
     elif arrangement == (120, 60, 60, 60, 60):
         y2 = y + 48
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_120)
-        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 24 - 1, fill=color_60)
-        canvas.create_rectangle(32 + 2, y + 24 + 1, 64, y2 - 1, fill=color_60)
-        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 24 - 1, fill=color_60)
-        canvas.create_rectangle(64 + 2, y + 24 + 1, 96, y2 - 1, fill=color_60)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 24 - 1, fill=PALLET_COLORS["60"])
+        canvas.create_rectangle(32 + 2, y + 24 + 1, 64, y2 - 1, fill=PALLET_COLORS["60"])
+        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 24 - 1, fill=PALLET_COLORS["60"])
+        canvas.create_rectangle(64 + 2, y + 24 + 1, 96, y2 - 1, fill=PALLET_COLORS["60"])
         draw_bracket(y, y2)
         draw_description(10, "120x80 x 1")
         draw_description(25, "60x80 x 4")
@@ -1081,9 +939,9 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 48 - 1
     elif arrangement == (17090, 145, 145):
         y2 = y + 68
-        canvas.create_rectangle(0 + 2, y + 2, 36, y2 - 1, fill=color_17090)
-        canvas.create_rectangle(36 + 2, y + 2, 96, y2 - 36 - 1, fill=color_145)
-        canvas.create_rectangle(36 + 2, y + 32 + 1, 96, y2 - 4 - 1, fill=color_145)
+        canvas.create_rectangle(0 + 2, y + 2, 36, y2 - 1, fill=PALLET_COLORS["17090"])
+        canvas.create_rectangle(36 + 2, y + 2, 96, y2 - 36 - 1, fill=PALLET_COLORS["145"])
+        canvas.create_rectangle(36 + 2, y + 32 + 1, 96, y2 - 4 - 1, fill=PALLET_COLORS["145"])
         draw_bracket(y, y2)
         draw_description(18, "170x90 x 1")
         draw_description(33, "145x80 x 2")
@@ -1092,11 +950,11 @@ def draw_arrangement(arrangement, canvas):
     elif arrangement == (17090, 17090, 130, 130, 130):
         y2 = y + 68
         y3 = y + 45
-        canvas.create_rectangle(0 + 2, y + 2, 36, y2 - 1, fill=color_17090)
-        canvas.create_rectangle(0 + 2, y + 68 + 1, 36, y2 + 67 - 1, fill=color_17090)
-        canvas.create_rectangle(36 + 2, y + 2, 96, y3, fill=color_130)
-        canvas.create_rectangle(36 + 2, y + 45 + 2, 96, y3 + 45 - 1, fill=color_130)
-        canvas.create_rectangle(36 + 2, y + 90 + 1, 96, y3 + 90 - 1, fill=color_130)
+        canvas.create_rectangle(0 + 2, y + 2, 36, y2 - 1, fill=PALLET_COLORS["17090"])
+        canvas.create_rectangle(0 + 2, y + 68 + 1, 36, y2 + 67 - 1, fill=PALLET_COLORS["17090"])
+        canvas.create_rectangle(36 + 2, y + 2, 96, y3, fill=PALLET_COLORS["130"])
+        canvas.create_rectangle(36 + 2, y + 45 + 2, 96, y3 + 45 - 1, fill=PALLET_COLORS["130"])
+        canvas.create_rectangle(36 + 2, y + 90 + 1, 96, y3 + 90 - 1, fill=PALLET_COLORS["130"])
         draw_bracket(y, y2 + 67)
         draw_description(50, "170x90 x 2")
         draw_description(65, "130x115 x 3")
@@ -1104,10 +962,10 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 135 - 1
     elif arrangement == (17080, 17080, 120, 60):
         y2 = y + 68
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
-        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=color_17080)
-        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 24 - 1, fill=color_120)
-        canvas.create_rectangle(64 + 2, y + 44 + 1, 96, y2 - 1, fill=color_60)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["17080"])
+        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 1, fill=PALLET_COLORS["17080"])
+        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 24 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(64 + 2, y + 44 + 1, 96, y2 - 1, fill=PALLET_COLORS["60"])
         draw_bracket(y, y2)
         draw_description(12, "170x80 x 2")
         draw_description(27, "120x80 x 1")
@@ -1116,11 +974,11 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 68 - 1
     elif arrangement == (17080, 120, 120, 60, 60):
         y2 = y + 68
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
-        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 24 - 1, fill=color_120)
-        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 24 - 1, fill=color_120)
-        canvas.create_rectangle(32 + 2, y + 44 + 1, 64, y2 - 1, fill=color_60)
-        canvas.create_rectangle(64 + 2, y + 44 + 1, 96, y2 - 1, fill=color_60)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["17080"])
+        canvas.create_rectangle(32 + 2, y + 2, 64, y2 - 24 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(64 + 2, y + 2, 96, y2 - 24 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(32 + 2, y + 44 + 1, 64, y2 - 1, fill=PALLET_COLORS["60"])
+        canvas.create_rectangle(64 + 2, y + 44 + 1, 96, y2 - 1, fill=PALLET_COLORS["60"])
         draw_bracket(y, y2)
         draw_description(12, "170x80 x 2")
         draw_description(27, "120x80 x 3")
@@ -1129,25 +987,25 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 68 - 1
     elif arrangement == (17080, 60):
         y2 = y + 32
-        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=color_17080)
-        canvas.create_rectangle(69 + 2, y + 2, 94, y2 - 1, fill=color_60)
+        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=PALLET_COLORS["17080"])
+        canvas.create_rectangle(69 + 2, y + 2, 94, y2 - 1, fill=PALLET_COLORS["60"])
         draw_bracket(y, y2)
         draw_description(10, "170x80 x 1, 60x80 x 1")
         draw_description(25, "0,8 ldm")
         brush_position += 32 - 1
     elif arrangement == (17090, 60):
         y2 = y + 36
-        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=color_17090)
-        canvas.create_rectangle(69 + 2, y + 2, 94, y2 - 4 - 1, fill=color_60)
+        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=PALLET_COLORS["17090"])
+        canvas.create_rectangle(69 + 2, y + 2, 94, y2 - 4 - 1, fill=PALLET_COLORS["60"])
         draw_bracket(y, y2)
         draw_description(10, "170x90 x 1, 60x80 x 1")
         draw_description(25, "0,9 ldm")
         brush_position += 36 - 1
     elif arrangement == (130, 120, 120):
         y2 = y + 64
-        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 8 - 1, fill=color_130)
-        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 32 - 1, fill=color_120)
-        canvas.create_rectangle(48 + 2, y + 32 + 1, 96, y2 - 1, fill=color_120)
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 8 - 1, fill=PALLET_COLORS["130"])
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 32 - 1, fill=PALLET_COLORS["120"])
+        canvas.create_rectangle(48 + 2, y + 32 + 1, 96, y2 - 1, fill=PALLET_COLORS["120"])
         draw_bracket(y, y2)
         draw_description(16, "130x115 x 1")
         draw_description(31, "120x80 x 2")
@@ -1155,24 +1013,24 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 64 - 1
     elif arrangement == (120114, 120114):
         y2 = y + 46
-        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120114)
-        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=color_120114)
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["120114"])
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["120114"])
         draw_bracket(y, y2)
         draw_description(16, "120x114 x 2")
         draw_description(31, "1,16 ldm")
         brush_position += 46 - 1
     elif arrangement == (120104, 120104):
         y2 = y + 42
-        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120104)
-        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=color_120104)
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["120104"])
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["120104"])
         draw_bracket(y, y2)
         draw_description(15, "120x104 x 2")
         draw_description(30, "1,06 ldm")
         brush_position += 42 - 1
     elif arrangement == (120114, 120104):
         y2 = y + 46
-        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120114)
-        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 5, fill=color_120104)
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["120114"])
+        canvas.create_rectangle(48 + 2, y + 2, 96, y2 - 5, fill=PALLET_COLORS["120104"])
         draw_bracket(y, y2)
         draw_description(9, "120x114 x 1")
         draw_description(24, "120x104 x 1")
@@ -1180,8 +1038,8 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 46 - 1
     elif arrangement == (17080, 120114):
         y2 = y + 68
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
-        canvas.create_rectangle(32 + 2, y + 2, 80, y2 - 23, fill=color_120114)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["17080"])
+        canvas.create_rectangle(32 + 2, y + 2, 80, y2 - 23, fill=PALLET_COLORS["120114"])
         draw_bracket(y, y2)
         draw_description(18, "170x80 x 1")
         draw_description(33, "120x114 x 1")
@@ -1189,8 +1047,8 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 68 - 1
     elif arrangement == (17080, 120104):
         y2 = y + 68
-        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=color_17080)
-        canvas.create_rectangle(32 + 2, y + 2, 80, y2 - 27, fill=color_120104)
+        canvas.create_rectangle(0 + 2, y + 2, 32, y2 - 1, fill=PALLET_COLORS["17080"])
+        canvas.create_rectangle(32 + 2, y + 2, 80, y2 - 27, fill=PALLET_COLORS["120104"])
         draw_bracket(y, y2)
         draw_description(18, "170x80 x 1")
         draw_description(33, "120x104 x 1")
@@ -1198,21 +1056,21 @@ def draw_arrangement(arrangement, canvas):
         brush_position += 68 - 1
     elif arrangement == 17080:
         y2 = y + 32
-        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=color_17080)
+        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=PALLET_COLORS["17080"])
         draw_bracket(y, y2)
         draw_description(10, "170x80 x 1")
         draw_description(25, "0,8 ldm")
         brush_position += 32 - 1
     elif arrangement == 120114:
         y2 = y + 46
-        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120114)
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["120114"])
         draw_bracket(y, y2)
         draw_description(16, "120x114 x 1")
         draw_description(31, "1,16 ldm")
         brush_position += 46 - 1
     elif arrangement == 120104:
         y2 = y + 42
-        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=color_120104)
+        canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["120104"])
         draw_bracket(y, y2)
         draw_description(15, "120x104 x 1")
         draw_description(30, "1,06 ldm")
@@ -1237,49 +1095,49 @@ def draw_leftovers(pallet, canvas, mode):
 
         if pallet == 60:
             y2 = y + 24
-            canvas.create_rectangle(12 + 2, y + 2, 44, y2 - 1, fill=color_60)
+            canvas.create_rectangle(12 + 2, y + 2, 44, y2 - 1, fill=PALLET_COLORS["60"])
             draw_number_of_leftovers(12, 60)
             draw_description(5, "60x80", 60)
             brush_position += 54 - 1
         elif pallet == 120:
             y2 = y + 48
-            canvas.create_rectangle(12 + 2, y + 2, 44, y2 - 1, fill=color_120)
+            canvas.create_rectangle(12 + 2, y + 2, 44, y2 - 1, fill=PALLET_COLORS["120"])
             draw_number_of_leftovers(24, 120)
             draw_description(18, "120x80", 120)
             brush_position += 78 - 1
         elif pallet == 145:
             y2 = y + 60
-            canvas.create_rectangle(12 + 2, y + 2, 44, y2 - 1, fill=color_145)
+            canvas.create_rectangle(12 + 2, y + 2, 44, y2 - 1, fill=PALLET_COLORS["145"])
             draw_number_of_leftovers(30, 145)
             draw_description(22, "145x80", 145)
             brush_position += 90 - 1
         elif pallet == 130:
             y2 = y + 56
-            canvas.create_rectangle(12 + 2, y + 2, 60, y2 - 1, fill=color_130)
+            canvas.create_rectangle(12 + 2, y + 2, 60, y2 - 1, fill=PALLET_COLORS["130"])
             draw_number_of_leftovers(28, 130)
             draw_description(21, "130x115", 130)
             brush_position += 86 - 1
         elif pallet == 17080:
             y2 = y + 68
-            canvas.create_rectangle(12 + 2, y + 2, 44, y2 - 1, fill=color_17080)
+            canvas.create_rectangle(12 + 2, y + 2, 44, y2 - 1, fill=PALLET_COLORS["17080"])
             draw_number_of_leftovers(34, 17080)
             draw_description(28, "170x80", 17080)
             brush_position += 98 - 1
         elif pallet == 17090:
             y2 = y + 68
-            canvas.create_rectangle(12 + 2, y + 2, 48, y2 - 1, fill=color_17090)
+            canvas.create_rectangle(12 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["17090"])
             draw_number_of_leftovers(34, 17090)
             draw_description(28, "170x90", 17090)
             brush_position += 98 - 1
         elif pallet == 120114:
             y2 = y + 46
-            canvas.create_rectangle(12 + 2, y + 2, 60, y2 - 1, fill=color_120114)
+            canvas.create_rectangle(12 + 2, y + 2, 60, y2 - 1, fill=PALLET_COLORS["120114"])
             draw_number_of_leftovers(23, 120114)
             draw_description(18, "120x114", 120114)
             brush_position += 76 - 1
         elif pallet == 120104:
             y2 = y + 42
-            canvas.create_rectangle(12 + 2, y + 2, 60, y2 - 1, fill=color_120104)
+            canvas.create_rectangle(12 + 2, y + 2, 60, y2 - 1, fill=PALLET_COLORS["120104"])
             draw_number_of_leftovers(21, 120104)
             draw_description(17, "120x104", 120104)
             brush_position += 72 - 1
