@@ -29,7 +29,7 @@ NON_PERMUTABLE_ARRANGEMENTS = (
 )
 
 # How much space each arrangement takes up (ldm * 100)
-ARRANGEMENT_VALUES = {
+ARRANGEMENT_LDM_VALUES = {
     (17090, 145, 145): 171,
     (17090, 17090, 130, 130, 130): 342,
     (17090, 60): 90,
@@ -56,7 +56,7 @@ ARRANGEMENT_VALUES = {
 }
 
 # How much space a single pallet of a given type takes up (ldm * 100)
-PALLET_VALUES = {
+PALLET_LDM_VALUES = {
     60: 20,
     120: 40,
     145: 50,

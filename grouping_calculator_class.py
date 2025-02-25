@@ -23,6 +23,8 @@ class GroupingCalculator:
             (no_of_120114, 120114)
         ]:
             self.pallet_list.extend([value] * count)
+        # A list holding all the calculated Grouping objects
+        self.groupings = []
         # A list will be created with all possible permutations of these arrangements, with the length of n!,
         # where n is the number of elements of permutable_arrangements. 8 elements is optimal, 9 is the practical
         # maximum.
@@ -53,11 +55,11 @@ class GroupingCalculator:
     # Checks if a given arrangement can be formed within the current pool of pallets; returns True if yes
     def arrangement_is_possible(self, checked_arrangement: tuple) -> bool:
         # Makes a working copy of the pallet list
-        all_items: list = self.pallet_list[:]
-        for item in checked_arrangement:
-            if item in all_items:
+        all_pallets: list = self.pallet_list[:]
+        for pallet in checked_arrangement:
+            if pallet in all_pallets:
                 # Removes pallet from the working pallet list copy, so it can't be used twice
-                all_items.remove(item)
+                all_pallets.remove(pallet)
             else:
                 return False
         return True

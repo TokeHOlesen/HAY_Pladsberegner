@@ -1,42 +1,37 @@
+from constants import ARRANGEMENT_LDM_VALUES, PALLET_LDM_VALUES
+
+
 class Grouping:
-    def __init__(self):
-        # How many arrangements of a given type have been constructed in total
-        self.arrangement_count = {
-            (17090, 145, 145): 0,
-            (17090, 17090, 130, 130, 130): 0,
-            (17090, 60): 0,
-            (130, 130): 0,
-            (120, 120, 120): 0,
-            (120, 120): 0,
-            (145, 145, 145): 0,
-            (17080, 17080, 17080): 0,
-            (130, 120, 120): 0,
-            (17080, 60): 0,
-            (17080, 17080, 120, 60): 0,
-            (17080, 120, 120, 60, 60): 0,
-            (60, 60, 60): 0,
-            (120, 120, 60, 60): 0,
-            (120, 60, 60, 60, 60): 0,
-            (120114, 120114): 0,
-            (120104, 120104): 0,
-            (120114, 120104): 0,
-            (17080, 120114): 0,
-            (17080, 120104): 0,
-            (120114,): 0,
-            (120104,): 0,
-            (17080,): 0
-        }
-        # How many loose pallets (not fitting into any arrangements) there are of a given type
-        self.loose_pallet_count = {
-            60: 0,
-            120: 0,
-            145: 0,
-            130: 0,
-            17080: 0,
-            17090: 0,
-            120114: 0,
-            120104: 0
-        }
+    """
+    Represents one grouping, containing all pallets, split into arrangements and loose pallets.
+    """
+    def __init__(self) -> None:
+        # A list of all arrangements in this grouping. Each arrangement is a tuple of integers
+        self.arrangements = []
+        # A list of all loose pallets in this grouping. Each pallet is represented by an integer
+        self.loose_pallets = []
+
+    @property
+    def arrangements_ldm(self) -> int:
+        """Returns the total ldm for all arrangements in this grouping."""
+        ldm_sum: int = 0
+        for checked_arrangement in self.arrangements:
+            ldm_sum += ARRANGEMENT_LDM_VALUES[checked_arrangement]
+        return ldm_sum
+
+    @property
+    def loose_pallets_ldm(self) -> int:
+        """Returns the total ldm for all loose pallets in this grouping."""
+        ldm_sum: int = 0
+        for checked_pallet in self.loose_pallets:
+            ldm_sum += PALLET_LDM_VALUES[checked_pallet]
+        return ldm_sum
+
+    @property
+    def total_ldm(self) -> int:
+        """Returns total ldm for this grouping (arrangements + loose pallets)"""
+        return self.arrangements_ldm + self.loose_pallets_ldm
 
     def add_arrangement(self, arrangement) -> None:
-        self.arrangement_count[arrangement] += 1
+        """Appends an arrangement to the "self.arrangements" list."""
+        self.arrangements.append(arrangement)

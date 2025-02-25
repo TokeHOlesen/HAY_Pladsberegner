@@ -212,14 +212,14 @@ def calculate_pallets():
         leftovers_ldm_result = 0
         for remaining_pallet in leftover_pallets_in_each_grouping[this_index]:
             remaining_pallet: int
-            leftovers_ldm_result += PALLET_VALUES[remaining_pallet]
+            leftovers_ldm_result += PALLET_LDM_VALUES[remaining_pallet]
         return leftovers_ldm_result
 
     # Calculates ldm for a given grouping (sum of pallets in arrangements and leftovers)
     def total_ldm(this_index):
         total_ldm_result = 0
-        for checked_grouping in all_possible_groupings[this_index]:
-            total_ldm_result += ARRANGEMENT_VALUES[checked_grouping]
+        for checked_arrangement in all_possible_groupings[this_index]:
+            total_ldm_result += ARRANGEMENT_LDM_VALUES[checked_arrangement]
         total_ldm_result += leftovers_ldm(this_index)
         return total_ldm_result
 
@@ -227,14 +227,14 @@ def calculate_pallets():
     def truck_ldm(this_truck):
         truck_ldm_result = 0
         for this_grouping in this_truck:
-            truck_ldm_result += ARRANGEMENT_VALUES[this_grouping]
+            truck_ldm_result += ARRANGEMENT_LDM_VALUES[this_grouping]
         return truck_ldm_result
 
     # Returns a list of the ldm values of all arrangements on a given truck, in ascending order
     def ldm_ascending_order(this_truck):
         ldm_ascending_list = []
         for this_grouping in this_truck:
-            ldm_ascending_list.append(ARRANGEMENT_VALUES[this_grouping])
+            ldm_ascending_list.append(ARRANGEMENT_LDM_VALUES[this_grouping])
         ldm_ascending_list.sort()
         return ldm_ascending_list
 
@@ -242,7 +242,7 @@ def calculate_pallets():
     def ldm_descending_order(this_truck):
         ldm_descending_list = []
         for this_grouping in this_truck:
-            ldm_descending_list.append(ARRANGEMENT_VALUES[this_grouping])
+            ldm_descending_list.append(ARRANGEMENT_LDM_VALUES[this_grouping])
         ldm_descending_list.sort()
         ldm_descending_list.reverse()
         return ldm_descending_list
@@ -501,7 +501,7 @@ def calculate_pallets():
     for pallets_remaining in leftover_pallets_in_each_grouping:
         remaining_ldm = 0
         for pallet in pallets_remaining:
-            remaining_ldm += PALLET_VALUES[pallet]
+            remaining_ldm += PALLET_LDM_VALUES[pallet]
         if remaining_ldm < lowest_remaining_ldm:
             lowest_remaining_ldm = remaining_ldm
 
@@ -599,11 +599,11 @@ def calculate_pallets():
                 if not only_leftovers_remain(arrangements_not_yet_used):
                     if arrangement not in ((120114,), (120104,), (17080,)):
                         truck_buffer.append(arrangement)
-                        truck_buffer_ldm.append(ARRANGEMENT_VALUES[arrangement])
+                        truck_buffer_ldm.append(ARRANGEMENT_LDM_VALUES[arrangement])
                         arrangements_not_yet_used.remove(arrangement)
                 else:
                     truck_buffer.append(arrangement)
-                    truck_buffer_ldm.append(ARRANGEMENT_VALUES[arrangement])
+                    truck_buffer_ldm.append(ARRANGEMENT_LDM_VALUES[arrangement])
                     arrangements_not_yet_used.remove(arrangement)
 
         while sum(truck_buffer_ldm) > max_truck_ldm:
@@ -629,7 +629,7 @@ def calculate_pallets():
                 for arrangement in trucks[i]:
                     if arrangement not in ((120114,), (120104,)):
                         for x in range(i, 0, -1):
-                            if truck_ldm(trucks[i - x]) + ARRANGEMENT_VALUES[arrangement] <= max_truck_ldm:
+                            if truck_ldm(trucks[i - x]) + ARRANGEMENT_LDM_VALUES[arrangement] <= max_truck_ldm:
                                 trucks[i - x].append(arrangement)
                                 trucks[i].remove(arrangement)
                                 optimization_possible = True
@@ -646,12 +646,12 @@ def calculate_pallets():
                                         if high_ldm not in (114, 104):
                                             optimization_possible = True
                                             for high_arrangement in trucks[i]:
-                                                if ARRANGEMENT_VALUES[high_arrangement] == high_ldm:
+                                                if ARRANGEMENT_LDM_VALUES[high_arrangement] == high_ldm:
                                                     trucks[i].remove(high_arrangement)
                                                     trucks[x].append(high_arrangement)
                                                     break
                                             for low_arrangement in trucks[x]:
-                                                if ARRANGEMENT_VALUES[low_arrangement] == low_ldm:
+                                                if ARRANGEMENT_LDM_VALUES[low_arrangement] == low_ldm:
                                                     trucks[x].remove(low_arrangement)
                                                     trucks[i].append(low_arrangement)
                                                     break
@@ -677,7 +677,7 @@ def calculate_pallets():
     if leftover_pallets:
         for pallet in loose_pallet_count:
             if loose_pallet_count[pallet] != 0:
-                ldm_of_leftovers += PALLET_VALUES[pallet] * loose_pallet_count[pallet]
+                ldm_of_leftovers += PALLET_LDM_VALUES[pallet] * loose_pallet_count[pallet]
 
     # Increases the number of trucks needed if there's not enough room for leftovers after
     # the groupable items have been assigned to their trucks.
@@ -726,10 +726,10 @@ def calculate_pallets():
             current_truck_ldm = 0
             for arrangement in arrangement_count:
                 if arrangement_count[arrangement] != 0:
-                    this_truck_ldm = ARRANGEMENT_VALUES[arrangement] * arrangement_count[arrangement]
+                    this_truck_ldm = ARRANGEMENT_LDM_VALUES[arrangement] * arrangement_count[arrangement]
                     text_output.insert(
                         "end", f"\n{ARRANGEMENT_FORMATTED_OUTPUT[arrangement]} x {arrangement_count[arrangement]} "
-                               f"({ARRANGEMENT_VALUES[arrangement] / 100} * {arrangement_count[arrangement]} = "
+                               f"({ARRANGEMENT_LDM_VALUES[arrangement] / 100} * {arrangement_count[arrangement]} = "
                                f"{this_truck_ldm / 100} ldm)")
                     current_truck_ldm += this_truck_ldm
 
