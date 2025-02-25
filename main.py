@@ -51,9 +51,9 @@ arrangement_counter = {
     (120114, 120104): 0,
     (17080, 120114): 0,
     (17080, 120104): 0,
-    120114: 0,
-    120104: 0,
-    17080: 0
+    (120114,): 0,
+    (120104,): 0,
+    (17080,): 0
 }
 
 # Counts loose pallets
@@ -359,16 +359,16 @@ def calculate_pallets():
         for t in range(len(trucks) - 1):
             for n in range(room_for_17080[t]):
                 if not loose_17080_pool == 0:
-                    trucks[t].append(17080)
+                    trucks[t].append((17080,))
                     loose_17080_pool -= 1
 
         # If there are any remaining pallets in the loose pool, puts them back on the truck they were taken from
         if loose_17080_pool > 0:
             for n in range(loose_17080_pool):
                 if not last_truck_with_17080 == 0:
-                    trucks[last_truck_with_17080].append(17080)
+                    trucks[last_truck_with_17080].append((17080,))
                 else:
-                    trucks[-1].append(17080)
+                    trucks[-1].append((17080,))
 
         # Resets optimization flag
         if trucks_before_rearrangement == trucks:
@@ -562,13 +562,13 @@ def calculate_pallets():
             leftover_pallets.remove(17080)
             leftover_pallets.remove(120104)
         while 17080 in leftover_pallets:
-            final_grouping.append(17080)
+            final_grouping.append((17080,))
             leftover_pallets.remove(17080)
         while 120114 in leftover_pallets:
-            final_grouping.append(120114)
+            final_grouping.append((120114,))
             leftover_pallets.remove(120114)
         while 120104 in leftover_pallets:
-            final_grouping.append(120104)
+            final_grouping.append((120104,))
             leftover_pallets.remove(120104)
 
     status_label.config(text="Færdig.")
@@ -586,7 +586,7 @@ def calculate_pallets():
 
     def only_leftovers_remain(pool):
         for this_arrangement in pool:
-            if this_arrangement not in (120114, 120104, 17080):
+            if this_arrangement not in ((120114,), (120104,), (17080,)):
                 return False
         return True
 
@@ -597,7 +597,7 @@ def calculate_pallets():
         while sum(truck_buffer_ldm) < max_truck_ldm and arrangements_not_yet_used != []:
             for arrangement in arrangements_not_yet_used:
                 if not only_leftovers_remain(arrangements_not_yet_used):
-                    if arrangement not in (120114, 120104, 17080):
+                    if arrangement not in ((120114,), (120104,), (17080,)):
                         truck_buffer.append(arrangement)
                         truck_buffer_ldm.append(ARRANGEMENT_VALUES[arrangement])
                         arrangements_not_yet_used.remove(arrangement)
@@ -627,7 +627,7 @@ def calculate_pallets():
         if len(trucks) > 1:
             for i in range(1, len(trucks)):
                 for arrangement in trucks[i]:
-                    if arrangement not in (120114, 120104):
+                    if arrangement not in ((120114,), (120104,)):
                         for x in range(i, 0, -1):
                             if truck_ldm(trucks[i - x]) + ARRANGEMENT_VALUES[arrangement] <= max_truck_ldm:
                                 trucks[i - x].append(arrangement)
@@ -1054,21 +1054,21 @@ def draw_arrangement(arrangement, canvas):
         draw_description(33, "120x104 x 1")
         draw_description(48, "1,71 ldm")
         brush_position += 68 - 1
-    elif arrangement == 17080:
+    elif arrangement == (17080,):
         y2 = y + 32
         canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=PALLET_COLORS["17080"])
         draw_bracket(y, y2)
         draw_description(10, "170x80 x 1")
         draw_description(25, "0,8 ldm")
         brush_position += 32 - 1
-    elif arrangement == 120114:
+    elif arrangement == (120114,):
         y2 = y + 46
         canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["120114"])
         draw_bracket(y, y2)
         draw_description(16, "120x114 x 1")
         draw_description(31, "1,16 ldm")
         brush_position += 46 - 1
-    elif arrangement == 120104:
+    elif arrangement == (120104,):
         y2 = y + 42
         canvas.create_rectangle(0 + 2, y + 2, 48, y2 - 1, fill=PALLET_COLORS["120104"])
         draw_bracket(y, y2)
