@@ -30,7 +30,7 @@ entry_focus = 0
 # The grouping determined to be optimal (the least used space and the fewest leftovers) will be broken up into "trucks".
 
 # Counter for arrangements of a given type
-arrangement_counter = {
+arrangement_count = {
     (17090, 145, 145): 0,
     (17090, 17090, 130, 130, 130): 0,
     (17090, 60): 0,
@@ -57,7 +57,7 @@ arrangement_counter = {
 }
 
 # Counts loose pallets
-pallet_counter = {
+loose_pallet_count = {
     60: 0,
     120: 0,
     145: 0,
@@ -67,6 +67,7 @@ pallet_counter = {
     120114: 0,
     120104: 0
 }
+
 
 
 # Moves focus to the next entry box or the Start button (runs when Enter is pressed)
@@ -95,7 +96,7 @@ def move_focus(key):
 # When "full" is passed as a parameter, resets everything
 # Otherwise leaves contents of entry boxes, max_target_ldm and text_output intact - useful when recalculating
 def reset_all(mode):
-    global pallet_counter
+    global loose_pallet_count
     global trucks
     global truck_to_draw
     global brush_position
@@ -105,7 +106,7 @@ def reset_all(mode):
     global max_truck_ldm
     global ldm_of_leftovers
     global entry_focus
-    pallet_counter = pallet_counter.fromkeys(pallet_counter, 0)
+    loose_pallet_count = loose_pallet_count.fromkeys(loose_pallet_count, 0)
     trucks = []
     truck_to_draw = 0
     brush_position = 0
@@ -182,7 +183,7 @@ def set_target_ldm(ldm_input):
 
 # Runs the main function in a separate thread
 # The thread is declared as a daemon to make sure it is terminated when the main window closes for any reason
-def threaded_calculate_pallets(event):
+def threaded_calculate_pallets(_):
     thread = Thread(target=calculate_pallets, daemon=True)
     thread.start()
 
@@ -583,7 +584,6 @@ def calculate_pallets():
     # until it reaches 13.6 or less, then moves on to the next truck.
 
     # Makes sure that makeshift leftovers arrangements consisting of single pallets are not used until the very end
-
     def only_leftovers_remain(pool):
         for this_arrangement in pool:
             if this_arrangement not in ((120114,), (120104,), (17080,)):
@@ -672,12 +672,12 @@ def calculate_pallets():
 
     # Counts the remaining (ungroupable) items and calculates their total ldm
     for pallet in leftover_pallets:
-        pallet_counter[pallet] += 1
+        loose_pallet_count[pallet] += 1
 
     if leftover_pallets:
-        for pallet in pallet_counter:
-            if pallet_counter[pallet] != 0:
-                ldm_of_leftovers += PALLET_VALUES[pallet] * pallet_counter[pallet]
+        for pallet in loose_pallet_count:
+            if loose_pallet_count[pallet] != 0:
+                ldm_of_leftovers += PALLET_VALUES[pallet] * loose_pallet_count[pallet]
 
     # Increases the number of trucks needed if there's not enough room for leftovers after
     # the groupable items have been assigned to their trucks.
@@ -706,11 +706,11 @@ def calculate_pallets():
         pallets_on_truck = 0
         truck_number += 1
 
-        for pallet in arrangement_counter:
-            arrangement_counter[pallet] = 0
+        for pallet in arrangement_count:
+            arrangement_count[pallet] = 0
 
         for arrangement in truck:
-            arrangement_counter[arrangement] += 1
+            arrangement_count[arrangement] += 1
             if type(arrangement) is tuple:
                 pallets_on_truck += len(arrangement)
             else:
@@ -724,12 +724,12 @@ def calculate_pallets():
             text_output.insert("end", "\nRester.")
         else:
             current_truck_ldm = 0
-            for arrangement in arrangement_counter:
-                if arrangement_counter[arrangement] != 0:
-                    this_truck_ldm = ARRANGEMENT_VALUES[arrangement] * arrangement_counter[arrangement]
+            for arrangement in arrangement_count:
+                if arrangement_count[arrangement] != 0:
+                    this_truck_ldm = ARRANGEMENT_VALUES[arrangement] * arrangement_count[arrangement]
                     text_output.insert(
-                        "end", f"\n{ARRANGEMENT_FORMATTED_OUTPUT[arrangement]} x {arrangement_counter[arrangement]} "
-                               f"({ARRANGEMENT_VALUES[arrangement] / 100} * {arrangement_counter[arrangement]} = "
+                        "end", f"\n{ARRANGEMENT_FORMATTED_OUTPUT[arrangement]} x {arrangement_count[arrangement]} "
+                               f"({ARRANGEMENT_VALUES[arrangement] / 100} * {arrangement_count[arrangement]} = "
                                f"{this_truck_ldm / 100} ldm)")
                     current_truck_ldm += this_truck_ldm
 
@@ -740,9 +740,9 @@ def calculate_pallets():
 
     text_output.insert("end", "\n\nRest:")
     if leftover_pallets:
-        for pallet in pallet_counter:
-            if pallet_counter[pallet] != 0:
-                text_output.insert("end", f"\n{PALLET_FORMATTED_OUTPUT[pallet]}: x {pallet_counter[pallet]}")
+        for pallet in loose_pallet_count:
+            if loose_pallet_count[pallet] != 0:
+                text_output.insert("end", f"\n{PALLET_FORMATTED_OUTPUT[pallet]}: x {loose_pallet_count[pallet]}")
         text_output.insert("end", f"\nI alt rester: {ldm_of_leftovers / 100} ldm.")
         pallets_total += len(leftover_pallets)
     else:
@@ -1087,11 +1087,11 @@ def draw_leftovers(pallet, canvas, mode):
         y = brush_position
 
         def draw_number_of_leftovers(yy, pallet_type):
-            canvas.create_text(70, y + yy, text=f"x{pallet_counter[pallet_type]}", font=("", "13"), anchor="w")
+            canvas.create_text(70, y + yy, text=f"x{loose_pallet_count[pallet_type]}", font=("", "13"), anchor="w")
 
         def draw_description(yy, text, pallet_type):
             canvas.create_text(115, y + yy, text=text, font=("", "8"), anchor="w")
-            canvas.create_text(115, y + yy + 15, text=f"{pallet_counter[pallet_type]} stk", font=("", "8"), anchor="w")
+            canvas.create_text(115, y + yy + 15, text=f"{loose_pallet_count[pallet_type]} stk", font=("", "8"), anchor="w")
 
         if pallet == 60:
             y2 = y + 24
