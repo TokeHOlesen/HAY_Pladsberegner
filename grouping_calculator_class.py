@@ -1,3 +1,6 @@
+from constants import PERMUTABLE_ARRANGEMENTS, NON_PERMUTABLE_ARRANGEMENTS
+
+
 class GroupingCalculator:
     def __init__(self,
                  no_of_60: int = 0,
@@ -25,30 +28,6 @@ class GroupingCalculator:
             self.pallet_list.extend([value] * count)
         # A list holding all the calculated Grouping objects
         self.groupings = []
-        # A list will be created with all possible permutations of these arrangements, with the length of n!,
-        # where n is the number of elements of permutable_arrangements. 8 elements is optimal, 9 is the practical
-        # maximum.
-        self.permutable_arrangements = (
-            (17090, 145, 145),
-            (17090, 17090, 130, 130, 130),
-            (17080, 17080, 120, 60),
-            (17080, 120, 120, 60, 60),
-            (120, 120),
-            (120, 120, 60, 60),
-            (17090, 60),
-            (130, 120, 120)
-        )
-        # These will be appended to every permutation of permutable_arrangements in a fixed order.
-        self.non_permutable_arrangements = (
-            (17080, 17080, 17080),
-            (120, 60, 60, 60, 60),
-            (17080, 60),
-            (145, 145, 145),
-            (130, 130),
-            (120114, 120114),
-            (120104, 120104),
-            (60, 60, 60)
-        )
         # Current calculation progress, in %
         self.progress: int = 0
 
