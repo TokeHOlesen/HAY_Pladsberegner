@@ -1,4 +1,4 @@
-class ArrangementCalculator:
+class GroupingCalculator:
     def __init__(self,
                  no_of_60: int = 0,
                  no_of_120: int = 0,
@@ -47,51 +47,14 @@ class ArrangementCalculator:
             (120104, 120104),
             (60, 60, 60)
         )
-        # How many arrangements of a given type have been constructed in total
-        self.arrangement_count = {
-            (17090, 145, 145): 0,
-            (17090, 17090, 130, 130, 130): 0,
-            (17090, 60): 0,
-            (130, 130): 0,
-            (120, 120, 120): 0,
-            (120, 120): 0,
-            (145, 145, 145): 0,
-            (17080, 17080, 17080): 0,
-            (130, 120, 120): 0,
-            (17080, 60): 0,
-            (17080, 17080, 120, 60): 0,
-            (17080, 120, 120, 60, 60): 0,
-            (60, 60, 60): 0,
-            (120, 120, 60, 60): 0,
-            (120, 60, 60, 60, 60): 0,
-            (120114, 120114): 0,
-            (120104, 120104): 0,
-            (120114, 120104): 0,
-            (17080, 120114): 0,
-            (17080, 120104): 0,
-            (120114,): 0,
-            (120104,): 0,
-            (17080,): 0
-        }
-        # How many loose pallets (not fitting into any arrangements) there are of a given type
-        self.loose_pallet_count = {
-            60: 0,
-            120: 0,
-            145: 0,
-            130: 0,
-            17080: 0,
-            17090: 0,
-            120114: 0,
-            120104: 0
-        }
         # Current calculation progress, in %
         self.progress: int = 0
 
     # Checks if a given arrangement can be formed within the current pool of pallets; returns True if yes
-    def arrangement_is_possible(self, current_arrangement):
+    def arrangement_is_possible(self, checked_arrangement: tuple) -> bool:
         # Makes a working copy of the pallet list
-        all_items = self.pallet_list[:]
-        for item in current_arrangement:
+        all_items: list = self.pallet_list[:]
+        for item in checked_arrangement:
             if item in all_items:
                 # Removes pallet from the working pallet list copy, so it can't be used twice
                 all_items.remove(item)
