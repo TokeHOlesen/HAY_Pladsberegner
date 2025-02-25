@@ -6,9 +6,9 @@ class ArrangementCollection:
     """An abstract base class for the Grouping and Truck classes."""
     def __init__(self) -> None:
         # A list of all arrangements in this grouping. Each arrangement is a tuple of integers
-        self.arrangements = []
+        self.arrangements: list[tuple] = []
         # A list of all loose pallets in this grouping. Each pallet is represented by an integer
-        self.loose_pallets = []
+        self.loose_pallets: list[int] = []
 
     @property
     def arrangements_ldm(self) -> int:

@@ -231,7 +231,7 @@ def calculate_pallets():
         return truck_ldm_result
 
     # Returns a list of the ldm values of all arrangements on a given truck, in ascending order
-    def ldm_ascending_order(this_truck):
+    def ldm_ascending_order(this_truck):  # CHECK
         ldm_ascending_list = []
         for this_grouping in this_truck:
             ldm_ascending_list.append(ARRANGEMENT_LDM_VALUES[this_grouping])
@@ -239,7 +239,7 @@ def calculate_pallets():
         return ldm_ascending_list
 
     # Returns a list of the ldm values of all arrangements on a given truck, in descending order
-    def ldm_descending_order(this_truck):
+    def ldm_descending_order(this_truck):  # CHECK
         ldm_descending_list = []
         for this_grouping in this_truck:
             ldm_descending_list.append(ARRANGEMENT_LDM_VALUES[this_grouping])
@@ -248,7 +248,7 @@ def calculate_pallets():
         return ldm_descending_list
 
     # Sorts arrangements on a given truck according to the order of items in arrangement_order
-    def sort_truck(truck_index):
+    def sort_truck(truck_index):  # CHECK
         sorted_truck = []
         for current_arrangement in ARRANGEMENT_ORDER:
             while current_arrangement in trucks[truck_index]:
