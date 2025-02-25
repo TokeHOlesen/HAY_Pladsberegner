@@ -198,7 +198,7 @@ def calculate_pallets():
     global ldm_of_leftovers
 
     # Checks if a given arrangement can be formed within the current pool of pallets; returns True if yes
-    def arrangement_is_possible(current_arrangement):
+    def arrangement_is_possible(current_arrangement):  # CHECK
         all_items = all_pallets[:]
         for item in current_arrangement:
             if item in all_items:
@@ -208,7 +208,7 @@ def calculate_pallets():
         return True
 
     # Calculates ldm of leftovers pallets for a given grouping
-    def leftovers_ldm(this_index):
+    def leftovers_ldm(this_index):  # CHECK
         leftovers_ldm_result = 0
         for remaining_pallet in leftover_pallets_in_each_grouping[this_index]:
             remaining_pallet: int
@@ -216,7 +216,7 @@ def calculate_pallets():
         return leftovers_ldm_result
 
     # Calculates ldm for a given grouping (sum of pallets in arrangements and leftovers)
-    def total_ldm(this_index):
+    def total_ldm(this_index):  # CHECK
         total_ldm_result = 0
         for checked_arrangement in all_possible_groupings[this_index]:
             total_ldm_result += ARRANGEMENT_LDM_VALUES[checked_arrangement]
@@ -224,7 +224,7 @@ def calculate_pallets():
         return total_ldm_result
 
     # Calculates the ldm of a truck
-    def truck_ldm(this_truck):
+    def truck_ldm(this_truck):  # CHECK
         truck_ldm_result = 0
         for this_grouping in this_truck:
             truck_ldm_result += ARRANGEMENT_LDM_VALUES[this_grouping]
