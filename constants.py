@@ -5,7 +5,7 @@ DEFAULT_MAX_TRUCK_LDM = 1330
 
 # A list will be created with all possible permutations of these arrangements, with the length of n!, where n is the
 # number of elements of permutable_arrangements. 8 elements is optimal, 9 is the practical maximum.
-PERMUTABLE_ARRANGEMENTS = [
+PERMUTABLE_ARRANGEMENTS = (
     (17090, 145, 145),
     (17090, 17090, 130, 130, 130),
     (17080, 17080, 120, 60),
@@ -14,10 +14,10 @@ PERMUTABLE_ARRANGEMENTS = [
     (120, 120, 60, 60),
     (17090, 60),
     (130, 120, 120)
-]
+)
 
 # These will be appended to every permutation of permutable_arrangements in a fixed order.
-NON_PERMUTABLE_ARRANGEMENTS = [
+NON_PERMUTABLE_ARRANGEMENTS = (
     (17080, 17080, 17080),
     (120, 60, 60, 60, 60),
     (17080, 60),
@@ -26,7 +26,7 @@ NON_PERMUTABLE_ARRANGEMENTS = [
     (120114, 120114),
     (120104, 120104),
     (60, 60, 60)
-]
+)
 
 # How much space each arrangement takes up (ldm * 100)
 ARRANGEMENT_VALUES = {
@@ -68,7 +68,7 @@ PALLET_VALUES = {
 }
 
 # The order in which arrangements will be shown on trucks
-ARRANGEMENT_ORDER = [
+ARRANGEMENT_ORDER = (
     (17080, 17080, 17080),
     (17080, 17080, 120, 60),
     (17080, 120, 120, 60, 60),
@@ -92,7 +92,7 @@ ARRANGEMENT_ORDER = [
     (17080, 120104),
     120114,
     120104
-]
+)
 
 # Used for text output - self-explanatory
 ARRANGEMENT_FORMATTED_OUTPUT = {
