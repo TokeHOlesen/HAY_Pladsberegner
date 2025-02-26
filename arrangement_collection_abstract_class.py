@@ -1,14 +1,23 @@
+import sys
 from sys import exit
 from constants import ARRANGEMENT_LDM_VALUES, PALLET_LDM_VALUES
 
 
 class ArrangementCollection:
-    """An abstract base class for the Grouping and Truck classes."""
+    """An abstract parent class for the Grouping and Truck classes."""
     def __init__(self) -> None:
         # A list of all arrangements in this grouping. Each arrangement is a tuple of integers
-        self.arrangements: list[tuple] = []
+        self.arrangements: list[tuple[int, ...]] = []
         # A list of all loose pallets in this grouping. Each pallet is represented by an integer
         self.loose_pallets: list[int] = []
+
+    def __contains__(self, item: int | tuple[int, ...]) -> bool:
+        if isinstance(item, tuple):
+            return item in self.arrangements
+        elif isinstance(item, int):
+            return item in self.loose_pallets
+        else:
+            exit(f"Error: {item} is neither tuple nor int.")
 
     @property
     def arrangements_ldm(self) -> int:
@@ -31,11 +40,11 @@ class ArrangementCollection:
         """Returns total ldm for this grouping (arrangements + loose pallets)"""
         return self.arrangements_ldm + self.loose_pallets_ldm
 
-    def add_arrangement(self, arrangement: tuple) -> None:
+    def add_arrangement(self, arrangement: tuple[int, ...]) -> None:
         """Appends an arrangement to the "self.arrangements" list."""
         self.arrangements.append(arrangement)
 
-    def remove_arrangement(self, arrangement: tuple) -> None:
+    def remove_arrangement(self, arrangement: tuple[int, ...]) -> None:
         """Removes an arrangement from the "self.arrangements" list."""
         try:
             self.arrangements.remove(arrangement)

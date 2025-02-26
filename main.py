@@ -260,61 +260,79 @@ def calculate_pallets():
     # Moves individual pallets back if there is at least 0.4 ldm of free space on a given truck and at least
     # one other 120 pallet already present.
 
-    def rearrange_120():
-        trucks_before_rearrangement = deepcopy(trucks)
-        # Calculates the ldm value for each truck and stores it in a list with indexes corresponding to trucks[]
-        this_truck_ldm_120 = []
-        for this_truck in trucks:
-            this_truck_ldm_120.append(truck_ldm(this_truck))
-        # Calculates how many individual 120 pallets there are on each truck
-        number_of_120 = []
-        for t in range(len(trucks)):
-            if (120, 120) in trucks[t]:
-                buffer_120 = 0
-                for this_grouping in trucks[t]:
-                    if this_grouping == (120, 120):
-                        buffer_120 += 2
-                # If there's room, transfers 120 pallets from the leftover pool
-                while this_truck_ldm_120[t] <= (max_truck_ldm - 40) and 120 in leftover_pallets:
-                    buffer_120 += 1
-                    this_truck_ldm_120[t] += 40
+    def rearrange_120():  # Original function quickly refactored by AI to add readability - basis for real refactoring
+        """
+        Optimizes the distribution of 120-sized pallets across trucks.
+
+        This function:
+        - Counts existing 120-sized pallet pairs per truck.
+        - Moves extra 120 pallets from the leftover pool to trucks if there's space.
+        - Redistributes 120 pallets between trucks when possible.
+        - Removes old pallet groupings and reassigns them optimally.
+
+        Returns:
+            bool: True if any changes were made, False otherwise.
+        """
+
+        # Save the initial truck state for later comparison
+        original_truck_state = deepcopy(trucks)
+
+        # Step 1: Compute current load meters (ldm) for each truck
+        truck_ldm_values = [truck_ldm(trck) for trck in trucks]
+
+        # Step 2: Count individual 120 pallets in each truck
+        num_120_pallets = []
+
+        for truck_index, trck in enumerate(trucks):
+            if (120, 120) in trck:  # If the truck contains 120-sized pallet pairs
+                count_120_pallets = sum(2 for grouping in trck if grouping == (120, 120))
+
+                # If there's room, move 120 pallets from leftovers to this truck
+                while truck_ldm_values[truck_index] <= (max_truck_ldm - 40) and 120 in leftover_pallets:
+                    count_120_pallets += 1
+                    truck_ldm_values[truck_index] += 40
                     leftover_pallets.remove(120)
-                number_of_120.append(buffer_120)
+
+                num_120_pallets.append(count_120_pallets)
             else:
-                number_of_120.append(0)
-        # If there's at least 0.4 ldm of free space and at least one 120 already present, moves pallets back
-        for t in range(1, len(trucks)):
-            for p in range(t):
-                while number_of_120[p] >= 1 and number_of_120[t] > 0 and this_truck_ldm_120[p] <= (max_truck_ldm - 40):
-                    number_of_120[p] += 1
-                    this_truck_ldm_120[p] += 40
-                    number_of_120[t] -= 1
-                    this_truck_ldm_120[t] -= 40
-        # Clears the existing groupings of 120 pallets on all trucks
-        for this_truck in trucks:
-            while (120, 120) in this_truck:
-                this_truck.remove((120, 120))
-        # Calculates the optimal distribution of 120 arrangements
-        for t in range(len(trucks)):
-            number_of_120_120 = 0
-            while number_of_120[t] >= 2 and number_of_120[t] % 3 != 0:
-                number_of_120[t] -= 2
-                number_of_120_120 += 1
-            if number_of_120[t] == 1:
+                num_120_pallets.append(0)
+
+        # Step 3: Redistribute 120 pallets between trucks
+        for receiving_truck in range(1, len(trucks)):  # Start from the second truck
+            for donating_truck in range(receiving_truck):  # Compare against earlier trucks
+                while (
+                        num_120_pallets[donating_truck] >= 1 and  # Donating truck has extra pallets
+                        num_120_pallets[receiving_truck] > 0 and  # Receiving truck has 120s to offload
+                        truck_ldm_values[donating_truck] <= (max_truck_ldm - 40)  # Donating truck has space
+                ):
+                    num_120_pallets[donating_truck] += 1
+                    truck_ldm_values[donating_truck] += 40
+                    num_120_pallets[receiving_truck] -= 1
+                    truck_ldm_values[receiving_truck] -= 40
+
+        # Step 4: Clear old 120 pallet groupings from all trucks
+        for trck in trucks:
+            while (120, 120) in trck:
+                trck.remove((120, 120))
+
+        # Step 5: Compute optimized grouping of 120 pallets
+        for truck_index, count in enumerate(num_120_pallets):
+            count_120_pairs = 0
+            while count >= 2 and count % 3 != 0:  # Try to group in pairs
+                count -= 2
+                count_120_pairs += 1
+
+            if count == 1:  # If one pallet is left over, store it in leftovers
                 leftover_pallets.append(120)
-            number_of_120_120_120 = number_of_120[t] // 3
-            # Moves arrangements to their respective trucks
-            for g in range(number_of_120_120):
-                trucks[t].append((120, 120))
-            for g in range(number_of_120_120_120):
-                trucks[t].append((120, 120, 120))
-        # Returns True if any work was done, or False if not
-        # This is used to reset the optimization routine even if no optimization happened in the first pass
-        # This is necessary because rearranging 120 pallets may change the pallet setup and make optimization possible
-        if trucks_before_rearrangement == trucks:
-            return False
-        else:
-            return True
+
+            count_120_triplets = count // 3  # Group in triplets if possible
+
+            # Step 6: Assign optimized pallet groupings back to trucks
+            trucks[truck_index].extend([(120, 120)] * count_120_pairs)
+            trucks[truck_index].extend([(120, 120, 120)] * count_120_triplets)
+
+        # Step 7: Check if any changes were made
+        return trucks != original_truck_state
 
     # If there's at least 0.8 ldm left on a truck, splits 3x170x80 arrengements into individual pallets that are then
     # redistributed among trucks. This is useful for HEE with large pallets and potential for wasted space
