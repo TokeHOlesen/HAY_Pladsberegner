@@ -10,7 +10,7 @@ PERMUTABLE_ARRANGEMENTS = (
     (17090, 17090, 130, 130, 130),
     (17080, 17080, 120, 60),
     (17080, 120, 120, 60, 60),
-    (120, 120),
+    # (120, 120), all 120 pallets will be distributed among trucks after arrangements have been calculated
     (120, 120, 60, 60),
     (17090, 60),
     (130, 120, 120)

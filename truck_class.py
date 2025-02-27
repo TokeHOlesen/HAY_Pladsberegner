@@ -8,7 +8,12 @@ class Truck(ArrangementCollection):
         super().__init__()
 
     @property
-    def ldm_ascending_order(self) -> list:
+    def number_of_loose_120(self) -> int:
+        """Returns the number of 120 pallets in 'self.loose_pallets'."""
+        return len(self.loose_pallets)
+
+    @property
+    def ldm_ascending_order(self) -> list[int]:
         """Returns a list of the ldm values for all arrangements on this truck, in ascending order."""
         ldm_ascending_list = []
         for arrangement in self.arrangements:
@@ -17,9 +22,20 @@ class Truck(ArrangementCollection):
         return ldm_ascending_list
 
     @property
-    def ldm_descending_order(self) -> list:
+    def ldm_descending_order(self) -> list[int]:
         """Returns a list of the ldm values for all arrangements on this truck, in descending order."""
         return self.ldm_ascending_order[::-1]
+
+    def form_120_arrangements(self) -> None:
+        """Forms (120, 120, 120) and (120, 120) arrangements from the loose 120 pallet pool."""
+        # Forms (120, 120) arrangements until the number left is divisible by 3
+        while self.number_of_loose_120 >= 2 and self.number_of_loose_120 % 3 != 0:
+            self.add_arrangement((120, 120))
+            self.remove_pallet(120, count=2)
+        # Forms (120, 120, 120) arrangements
+        if self.number_of_loose_120 >= 3:
+            self.add_arrangement((120, 120, 120), count=self.number_of_loose_120 // 3)
+            self.remove_pallet(120, 3)
 
     def sort_arrangements(self):
         """Sorts arrangements on this truck according to the order defined in ARRANGEMENT_ORDER."""
