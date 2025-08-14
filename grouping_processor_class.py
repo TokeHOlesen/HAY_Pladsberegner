@@ -3,7 +3,7 @@ from constants import PERMUTABLE_ARRANGEMENTS, NON_PERMUTABLE_ARRANGEMENTS
 from grouping_class import Grouping
 
 
-class GroupingCalculator:
+class GroupingProcessor:
     """
     Accepts the total number of pallets at init and calculates all possible groupings.
     Use self.progress for current progress during calculation.
@@ -40,13 +40,13 @@ class GroupingCalculator:
     # Generates all possible groupings and appends them to self.groupings[]
     def calculate_groupings(self):
         """
-        Calculates all possible permutations of items in permutable_arrangements.
+        Calculates all possible permutations of items in PERMUTABLE_ARRANGEMENTS.
         Appends arrangements from NON_PERMUTABLE_ARRANGEMENTS to each permutation.
         Later, calculates all possible groupings.
         """
-        all_permutations = tuple(
-            perm + NON_PERMUTABLE_ARRANGEMENTS
-            for perm in permutations(PERMUTABLE_ARRANGEMENTS, len(PERMUTABLE_ARRANGEMENTS))
+        all_permutations: tuple = tuple(
+            permutation + NON_PERMUTABLE_ARRANGEMENTS
+            for permutation in permutations(PERMUTABLE_ARRANGEMENTS, len(PERMUTABLE_ARRANGEMENTS))
         )
 
         no_of_permutations = len(all_permutations)
@@ -82,9 +82,7 @@ class GroupingCalculator:
 
     @staticmethod
     def arrangement_is_possible(checked_arrangement: tuple[int, ...], pallet_list: list[int]) -> bool:
-        """
-        Checks if a given arrangement can be formed within the current pool of pallets; returns True if yes.
-        """
+        """Checks if a given arrangement can be formed within the current pool of pallets; returns True if yes."""
         temp_pallet_list = pallet_list.copy()
         for pallet in checked_arrangement:
             if pallet in temp_pallet_list:
