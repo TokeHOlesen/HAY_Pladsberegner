@@ -68,10 +68,8 @@ loose_pallet_count = {
     120104: 0
 }
 
-
-
 # Moves focus to the next entry box or the Start button (runs when Enter is pressed)
-def move_focus(key):
+def move_focus(key):    # CHECK - Irrelevant
     global entry_focus
 
     if str(window.focus_get()) == ".!frame.!entry":
@@ -95,7 +93,7 @@ def move_focus(key):
 # Resets global values
 # When "full" is passed as a parameter, resets everything
 # Otherwise leaves contents of entry boxes, max_target_ldm and text_output intact - useful when recalculating
-def reset_all(mode):
+def reset_all(mode):    # CHECK - irrelevant
     global loose_pallet_count
     global trucks
     global truck_to_draw
@@ -159,7 +157,7 @@ def reset_all(mode):
 # Reads the contents of ldm_entry entry box and extracts a max_target_ldm value
 # Corrects to 13.6 if the requested value is higher than 13.6, or to 3.5 if it's lower than 3.5
 # Corrects to 13.5 if the value is not a valid number
-def set_target_ldm(ldm_input):
+def set_target_ldm(ldm_input):  # CHECK - Irrelevant
     global max_truck_ldm
     ldm_input = ldm_input.replace(",", ".")
     ldm_control = ldm_input.replace(".", "")
@@ -183,7 +181,7 @@ def set_target_ldm(ldm_input):
 
 # Runs the main function in a separate thread
 # The thread is declared as a daemon to make sure it is terminated when the main window closes for any reason
-def threaded_calculate_pallets(_):
+def threaded_calculate_pallets(_):  # CHECK - Irrelevant
     thread = Thread(target=calculate_pallets, daemon=True)
     thread.start()
 
@@ -198,7 +196,7 @@ def calculate_pallets():
     global ldm_of_leftovers
 
     # Checks if a given arrangement can be formed within the current pool of pallets; returns True if yes
-    def arrangement_is_possible(current_arrangement):  # CHECK
+    def arrangement_is_possible(current_arrangement):  # CHECK - Grouping Calculator
         all_items = all_pallets[:]
         for item in current_arrangement:
             if item in all_items:
@@ -208,7 +206,7 @@ def calculate_pallets():
         return True
 
     # Calculates ldm of leftovers pallets for a given grouping
-    def leftovers_ldm(this_index):  # CHECK
+    def leftovers_ldm(this_index):  # CHECK - Arragement Collection
         leftovers_ldm_result = 0
         for remaining_pallet in leftover_pallets_in_each_grouping[this_index]:
             remaining_pallet: int
@@ -216,7 +214,7 @@ def calculate_pallets():
         return leftovers_ldm_result
 
     # Calculates ldm for a given grouping (sum of pallets in arrangements and leftovers)
-    def total_ldm(this_index):  # CHECK
+    def total_ldm(this_index):  # CHECK - Arrangement Collection
         total_ldm_result = 0
         for checked_arrangement in all_possible_groupings[this_index]:
             total_ldm_result += ARRANGEMENT_LDM_VALUES[checked_arrangement]
@@ -224,14 +222,14 @@ def calculate_pallets():
         return total_ldm_result
 
     # Calculates the ldm of a truck
-    def truck_ldm(this_truck):  # CHECK
+    def truck_ldm(this_truck):  # CHECK - Arrangement Collection
         truck_ldm_result = 0
         for this_grouping in this_truck:
             truck_ldm_result += ARRANGEMENT_LDM_VALUES[this_grouping]
         return truck_ldm_result
 
     # Returns a list of the ldm values of all arrangements on a given truck, in ascending order
-    def ldm_ascending_order(this_truck):  # CHECK
+    def ldm_ascending_order(this_truck):  # CHECK - Truck
         ldm_ascending_list = []
         for this_grouping in this_truck:
             ldm_ascending_list.append(ARRANGEMENT_LDM_VALUES[this_grouping])
@@ -239,7 +237,7 @@ def calculate_pallets():
         return ldm_ascending_list
 
     # Returns a list of the ldm values of all arrangements on a given truck, in descending order
-    def ldm_descending_order(this_truck):  # CHECK
+    def ldm_descending_order(this_truck):  # CHECK - Truck
         ldm_descending_list = []
         for this_grouping in this_truck:
             ldm_descending_list.append(ARRANGEMENT_LDM_VALUES[this_grouping])
@@ -248,7 +246,7 @@ def calculate_pallets():
         return ldm_descending_list
 
     # Sorts arrangements on a given truck according to the order of items in arrangement_order
-    def sort_truck(truck_index):  # CHECK
+    def sort_truck(truck_index):  # CHECK - Truck
         sorted_truck = []
         for current_arrangement in ARRANGEMENT_ORDER:
             while current_arrangement in trucks[truck_index]:
@@ -260,7 +258,7 @@ def calculate_pallets():
     # Moves individual pallets back if there is at least 0.4 ldm of free space on a given truck and at least
     # one other 120 pallet already present.
 
-    def rearrange_120():  # Original function quickly refactored by AI to add readability - basis for real refactoring
+    def rearrange_120():  # CHECK - Truck
         """
         Optimizes the distribution of 120-sized pallets across trucks.
 
@@ -273,6 +271,12 @@ def calculate_pallets():
         Returns:
             bool: True if any changes were made, False otherwise.
         """
+
+        # REFACTORING NOTE: This is overly complex and works when groupings containing 120 pallets are added to trucks
+        # during the first round of distributing arrangements. After refactoring, (120, 120) and (120, 120, 120)
+        # arrangements won't be formed at all in the first round; only after all other arrangements have been formed,
+        # the remaining pallets will be distributed among trucks (as long as there is room for at least two), and then
+        # arrangements will be formed on the trucks themselves
 
         # Save the initial truck state for later comparison
         original_truck_state = deepcopy(trucks)
@@ -336,7 +340,7 @@ def calculate_pallets():
 
     # If there's at least 0.8 ldm left on a truck, splits 3x170x80 arrengements into individual pallets that are then
     # redistributed among trucks. This is useful for HEE with large pallets and potential for wasted space
-    def rearrange_17080():
+    def rearrange_17080():  # Check - Irrelevant (17080s will no longer be individually redistributed)
         trucks_before_rearrangement = deepcopy(trucks)
 
         # Finds the index of the final truck with 17080 pallets
@@ -395,6 +399,8 @@ def calculate_pallets():
         else:
             return True
 
+    ### CHECK - Whole section irrelevant
+
     # If any data from a previous calculation exists, resets everything except the contens of entry boxes, text output
     # box and the value of max_truck_ldm
     if trucks or ldm_of_leftovers:
@@ -444,6 +450,7 @@ def calculate_pallets():
     text_output.insert("end", "\nStarter op...")
     status_label.config(text="Starter op...")
 
+    # CHECK
     # Calculates all possible permutations of items in permutable_arrangements
     all_permutations = list(permutations(PERMUTABLE_ARRANGEMENTS, len(PERMUTABLE_ARRANGEMENTS)))
 

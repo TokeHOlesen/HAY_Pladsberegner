@@ -35,9 +35,9 @@ class Truck(ArrangementCollection):
         # Forms (120, 120, 120) arrangements
         if self.number_of_loose_120 >= 3:
             self.add_arrangement((120, 120, 120), count=self.number_of_loose_120 // 3)
-            self.remove_pallet(120, 3)
+            self.remove_pallet(120, count=self.number_of_loose_120)
 
-    def sort_arrangements(self):
+    def sort_arrangements(self) -> None:
         """Sorts arrangements on this truck according to the order defined in ARRANGEMENT_ORDER."""
         sorted_arrangements = []
         for arrangement in ARRANGEMENT_ORDER:

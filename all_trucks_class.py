@@ -7,7 +7,7 @@ class AllTrucks:
     def __init__(self, max_ldm=DEFAULT_MAX_TRUCK_LDM) -> None:
         # Holds objects of the Truck class, containing all pallets, sorted into arrangements
         self.trucks: list[Truck] = []
-        # A list of  loose leftover pallets, not assigned to any truck
+        # A list of loose leftover pallets, not assigned to any truck
         self.loose_pallets: list[int] = []
         # How many load meters may at most be loaded on this truck, * 100
         self.max_ldm: int = max_ldm
@@ -31,7 +31,7 @@ class AllTrucks:
             if self.max_ldm >= truck.total_ldm + (PALLET_LDM_VALUES[120] * 2) and self.number_of_loose_120 >= 2:
                 # Transfers 120 pallets from the general loose pallet pool to the truck's loose pallet pool,
                 # until there's no room or pallets left
-                while truck.total_ldm + PALLET_LDM_VALUES[120] <= self.max_ldm and self.number_of_loose_120 >= 1:
+                while (truck.total_ldm + PALLET_LDM_VALUES[120]) <= self.max_ldm and self.number_of_loose_120 >= 1:
                     truck.add_pallet(120)
                     self.loose_pallets.remove(120)
 
