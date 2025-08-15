@@ -66,12 +66,11 @@ class GroupingProcessor:
                     for pallet in arrangement:
                         pallet_list_copy.remove(pallet)
             # If there are any remaining loose pallets, adds them to the grouping's loose pallets list
-            if len(pallet_list_copy) == 0:
+            for pallet in pallet_list_copy:
+                new_grouping.add_pallet(pallet)
+            if new_grouping.is_perfect:
                 self.contains_perfect = True
                 # TODO: stop as soon as a perfect grouping is found
-            else:
-                for pallet in pallet_list_copy:
-                    new_grouping.add_pallet(pallet)
             self.groupings.append(new_grouping)
 
     def prune_groupings(self):
