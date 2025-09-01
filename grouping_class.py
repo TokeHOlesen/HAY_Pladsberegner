@@ -13,7 +13,7 @@ class Grouping(ArrangementCollection):
         """
         A grouping is considered perfect if it contains no loose pallets; it is an ideal solution.
         Since any amount of 120 pallets >1 can form arrangements, and because 120 pallets are distributed among trucks
-        after other arrangements have been formed, any grouping that only contains at least 2 120 pallets is also
+        after other arrangements have been formed, any grouping that only contains at least 2 loose 120 pallets is also
         considered perfect.
         """
         # Perfect if there are no loose pallets

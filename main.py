@@ -457,6 +457,7 @@ def calculate_pallets():
     # Combines all permutations of permutable_arrangements with non_permutable_arrangements (fixed order),
     # for a full list of possible permutations of arrangements
 
+    # CHECK
     possible_arrangements = []
 
     for i in range(len(all_permutations)):
@@ -480,6 +481,7 @@ def calculate_pallets():
     # How much room each grouping requires
     total_ldm_in_each_grouping = []
 
+    # CHECK
     # Checks all possible arrangements for matches within the current item pool
     # If a match is found, the groupings are copied to all_possible_groupings
     # If any pallets remain ungrouped, they are copied to leftover_pallets_in_each_grouping
@@ -504,6 +506,7 @@ def calculate_pallets():
     text_output.insert("end", "\nFinder den optimale løsning...")
     status_label.config(text="Optimerer..")
 
+    # CHECK
     # Checks if perfect solutions exist (complete groupings with no leftovers)
     # If a perfect solution is found, purges all imperfect solutions
     for pallets_leftover in leftover_pallets_in_each_grouping:
@@ -517,10 +520,12 @@ def calculate_pallets():
                 del leftover_pallets_in_each_grouping[index_to_delete]
             break
 
+    # CHECK
     # Calculates ldm value for every grouping
     for grouping_index in range(len(all_possible_groupings)):
         total_ldm_in_each_grouping.append(total_ldm(grouping_index))
 
+    # CHECK
     # Finds lowest ldm value for leftover items
     lowest_remaining_ldm = 65535
     for pallets_remaining in leftover_pallets_in_each_grouping:
@@ -530,6 +535,7 @@ def calculate_pallets():
         if remaining_ldm < lowest_remaining_ldm:
             lowest_remaining_ldm = remaining_ldm
 
+    # CHECK
     # Deletes groupings where leftover ldm is higher than lowest found
     for ldm_index in range(len(leftover_pallets_in_each_grouping) - 1, -1, -1):
         if leftovers_ldm(ldm_index) > lowest_remaining_ldm:
@@ -537,12 +543,14 @@ def calculate_pallets():
             del leftover_pallets_in_each_grouping[ldm_index]
             del total_ldm_in_each_grouping[ldm_index]
 
+    # CHECK
     # Finds lowest ldm value for groupings
     lowest_ldm = 65535
     for checked_ldm in total_ldm_in_each_grouping:
         if checked_ldm < lowest_ldm:
             lowest_ldm = checked_ldm
 
+    # CHECK
     # Deletes groupings with ldm values higher than lowest found
     for ldm_index in range(len(all_possible_groupings) - 1, -1, -1):
         if total_ldm_in_each_grouping[ldm_index] > lowest_ldm:
@@ -550,10 +558,12 @@ def calculate_pallets():
             del leftover_pallets_in_each_grouping[ldm_index]
             del total_ldm_in_each_grouping[ldm_index]
 
+    # CHECK
     # Copies the first elements of the arrays into lists containing the final grouping
     final_grouping = all_possible_groupings[0]
     leftover_pallets = leftover_pallets_in_each_grouping[0]
 
+    # CHECK - No longer relevant
     # If there are 2 or more (130, 120, 120) groups, reorganizes them into (130, 130) and (120, 120) groups.
 
     if (130, 120, 120) in final_grouping:
@@ -572,6 +582,7 @@ def calculate_pallets():
                     final_grouping.append((120, 120))
                 final_grouping.append((130, 130))
 
+    # CHECK - No longer relevant
     # HEE only - turns leftovers of 120114, 120104 and 17080 pallets into makeshift arrangements
 
     if leftover_pallets:
@@ -615,6 +626,7 @@ def calculate_pallets():
                 return False
         return True
 
+    # CHECK - No longer relevant
     while arrangements_not_yet_used:
         truck_buffer = []
         truck_buffer_ldm = []
@@ -637,6 +649,7 @@ def calculate_pallets():
 
         trucks.append(truck_buffer)
 
+    # CHECK - No longer relevant - replace with BFT algorith
     # Space optimization:
     # If there's more than one truck, checks if anything can be moved back to a previous truck
     # Then, checks if any smaller groupings can be swapped with bigger ones from the next truck
@@ -659,6 +672,7 @@ def calculate_pallets():
                                 trucks[i].remove(arrangement)
                                 optimization_possible = True
                                 break
+            # Holy mother of nested loops
             # Swaps smaller arrangements for bigger ones to make optimal use of space
             for i in range(1, len(trucks)):
                 for x in range(i):
