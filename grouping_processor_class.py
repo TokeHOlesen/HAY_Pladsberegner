@@ -41,7 +41,7 @@ class GroupingProcessor:
         self.best_grouping: Grouping = Grouping()
 
     # Generates all possible groupings and appends them to self.groupings[]
-    def calculate_groupings(self):
+    def calculate_groupings(self) -> None:
         """
         Calculates all possible permutations of items in PERMUTABLE_ARRANGEMENTS.
         Appends arrangements from NON_PERMUTABLE_ARRANGEMENTS to each permutation.
@@ -93,6 +93,19 @@ class GroupingProcessor:
         lowest_arr_ldm = self.get_lowest_arrangement_ldm()
         self.groupings[:] = [grouping for grouping in self.groupings if grouping.arrangements_ldm == lowest_arr_ldm]
 
+    def set_best_grouping(self) -> None:
+        """
+        Sets self.best_grouping to self.groupings[0].
+        If used after pruning, the groupings that are left are equivalent, so the first one is used.
+        """
+        self.best_grouping = self.groupings[0]
+
+    def sort_best_grouping(self) -> None:
+        """Sorts the arrangements within self.best_grouping by size, in descending order."""
+        self.best_grouping.arrangements = sorted(self.best_grouping.arrangements,
+                                                 key=lambda x: ARRANGEMENT_LDM_VALUES[x],
+                                                 reverse=True)
+
     def get_lowest_loose_ldm(self) -> int:
         """Checks the total ldm value of loose pallets in every grouping and returns the lowest one."""
         lowest_ldm = 65536
@@ -107,19 +120,6 @@ class GroupingProcessor:
             lowest_ldm = grouping.arrangements_ldm if grouping.arrangements_ldm < lowest_ldm else lowest_ldm
         return lowest_ldm
 
-    def set_best_grouping(self):
-        """
-        Sets self.best_grouping to self.groupings[0].
-        If used after pruning, the groupings that are left are equivalent, so the first one is used.
-        """
-        self.best_grouping = self.groupings[0]
-
-    def sort_best_grouping(self):
-        """Sorts the arrangements within self.best_grouping by size, in descending order."""
-        self.best_grouping.arrangements = sorted(self.best_grouping.arrangements,
-                                                 key=lambda x: ARRANGEMENT_LDM_VALUES[x],
-                                                 reverse=True)
-
     @staticmethod
     def arrangement_is_possible(checked_arrangement: tuple[int, ...], pallet_list: list[int]) -> bool:
         """Checks if a given arrangement can be formed within the current pool of pallets; returns True if yes."""
@@ -131,3 +131,9 @@ class GroupingProcessor:
             else:
                 return False
         return True
+
+    def process_groupings(self) -> None:
+        self.calculate_groupings()
+        self.prune_groupings()
+        self.set_best_grouping()
+        self.sort_best_grouping()
