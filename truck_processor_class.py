@@ -1,14 +1,21 @@
 from constants import DEFAULT_MAX_TRUCK_LDM, PALLET_LDM_VALUES
 from truck_class import Truck
+from grouping_class import Grouping
 
 
-class AllTrucks:
-    """Represents all the trucks necessary to transport all the pallets."""
-    def __init__(self, max_ldm=DEFAULT_MAX_TRUCK_LDM) -> None:
+class TruckProcessor:
+    """
+    Represents all the trucks necessary to transport all the pallets.
+    A Grouping object must be passed to the constructor - the arrangements and loose pallets in that grouping will then
+    be distributed among trucks.
+    """
+    def __init__(self, grouping: Grouping, max_ldm=DEFAULT_MAX_TRUCK_LDM) -> None:
         # Holds objects of the Truck class, containing all pallets, sorted into arrangements
         self.trucks: list[Truck] = []
-        # A list of loose leftover pallets, not assigned to any truck
-        self.loose_pallets: list[int] = []
+        # A list of all arrangements to be distributed
+        self.arrangements = grouping.arrangements
+        # A list of loose leftover pallets, not in arrangements
+        self.loose_pallets: list[int] = grouping.loose_pallets
         # How many load meters may at most be loaded on this truck, * 100
         self.max_ldm: int = max_ldm
 
@@ -21,7 +28,10 @@ class AllTrucks:
     def number_of_loose_120(self) -> int:
         return sum(1 for 120 in self.loose_pallets)
 
-    def distribute_120_pallets(self):
+    def add_truck(self) -> None:
+        self.trucks.append(Truck())
+
+    def distribute_120_pallets(self) -> None:
         """
         If there are any 120 pallets in the loose pallet pool, distributes them among the trucks.
         To make sure that arrangements can be formed, adds at least two pallets per truck, more if there's room.

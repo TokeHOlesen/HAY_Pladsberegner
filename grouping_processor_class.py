@@ -133,6 +133,7 @@ class GroupingProcessor:
         return True
 
     def process_groupings(self) -> None:
+        """Forms groupings, prunes them, chooses the best one and sorts the arrangements on it."""
         self.calculate_groupings()
         self.prune_groupings()
         self.set_best_grouping()
