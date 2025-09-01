@@ -1,10 +1,12 @@
 from arrangement_collection_abstract_class import ArrangementCollection
+from constants import ARRANGEMENT_LDM_VALUES
 
 
 class Grouping(ArrangementCollection):
     """
     Represents one grouping, containing all pallets, split into arrangements (tuples) and loose pallets (integers).
     """
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -28,3 +30,9 @@ class Grouping(ArrangementCollection):
             if pallet != 120:
                 return False
         return True
+
+    def sort_arrangements(self) -> None:
+        """Sorts the arrangements by size, in descending order."""
+        self.arrangements = sorted(self.arrangements,
+                                   key=lambda x: ARRANGEMENT_LDM_VALUES[x],
+                                   reverse=True)

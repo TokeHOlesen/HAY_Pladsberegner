@@ -4,8 +4,14 @@ from constants import ARRANGEMENT_LDM_VALUES, ARRANGEMENT_ORDER
 
 class Truck(ArrangementCollection):
     """Represents one truck, containing arrangements (tuples) and loose pallets (integers)."""
-    def __init__(self) -> None:
+    def __init__(self, max_ldm: int) -> None:
         super().__init__()
+        self.max_ldm: int = max_ldm
+
+    @property
+    def remaining_ldm(self) -> int:
+        """Returns how much ldm is free on this truck."""
+        return self.max_ldm - self.total_ldm
 
     @property
     def number_of_loose_120(self) -> int:

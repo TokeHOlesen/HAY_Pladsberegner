@@ -1,5 +1,5 @@
 from itertools import permutations
-from constants import PERMUTABLE_ARRANGEMENTS, NON_PERMUTABLE_ARRANGEMENTS, ARRANGEMENT_LDM_VALUES
+from constants import PERMUTABLE_ARRANGEMENTS, NON_PERMUTABLE_ARRANGEMENTS
 from grouping_class import Grouping
 
 
@@ -68,6 +68,9 @@ class GroupingProcessor:
                     new_grouping.add_arrangement(arrangement)
                     for pallet in arrangement:
                         pallet_list_copy.remove(pallet)
+                    # Makes sure to only form one arrangement of the (130, 120, 120) type
+                    if arrangement == (130, 120, 120):
+                        break
             # If there are any remaining loose pallets, adds them to the grouping's loose pallets list
             for pallet in pallet_list_copy:
                 new_grouping.add_pallet(pallet)
@@ -93,19 +96,6 @@ class GroupingProcessor:
         lowest_arr_ldm = self.get_lowest_arrangement_ldm()
         self.groupings[:] = [grouping for grouping in self.groupings if grouping.arrangements_ldm == lowest_arr_ldm]
 
-    def set_best_grouping(self) -> None:
-        """
-        Sets self.best_grouping to self.groupings[0].
-        If used after pruning, the groupings that are left are equivalent, so the first one is used.
-        """
-        self.best_grouping = self.groupings[0]
-
-    def sort_best_grouping(self) -> None:
-        """Sorts the arrangements within self.best_grouping by size, in descending order."""
-        self.best_grouping.arrangements = sorted(self.best_grouping.arrangements,
-                                                 key=lambda x: ARRANGEMENT_LDM_VALUES[x],
-                                                 reverse=True)
-
     def get_lowest_loose_ldm(self) -> int:
         """Checks the total ldm value of loose pallets in every grouping and returns the lowest one."""
         lowest_ldm = 65536
@@ -119,6 +109,13 @@ class GroupingProcessor:
         for grouping in self.groupings:
             lowest_ldm = grouping.arrangements_ldm if grouping.arrangements_ldm < lowest_ldm else lowest_ldm
         return lowest_ldm
+
+    def set_best_grouping(self) -> None:
+        """
+        Sets self.best_grouping to self.groupings[0].
+        If used after pruning, the groupings that are left are equivalent, so the first one is used.
+        """
+        self.best_grouping = self.groupings[0]
 
     @staticmethod
     def arrangement_is_possible(checked_arrangement: tuple[int, ...], pallet_list: list[int]) -> bool:
@@ -137,4 +134,4 @@ class GroupingProcessor:
         self.calculate_groupings()
         self.prune_groupings()
         self.set_best_grouping()
-        self.sort_best_grouping()
+        self.best_grouping.sort_arrangements()
