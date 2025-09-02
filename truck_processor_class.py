@@ -43,14 +43,14 @@ class TruckProcessor:
 
     def distribute_arrangements(self) -> None:
         """
-        Distributes arrangements between trucks, using the best-fit decreasing algorithm.
+        Distributes arrangements between trucks, using the first-fit decreasing algorithm.
         If there is no room on any of the existing trucks, adds a new one and places the arrangement there.
         """
+        # TODO: reimplement with best-fit decreasing algorithm
         self.add_truck()
-
         for arrangement in self.arrangements:
             placed: bool = False
-            for i, truck in enumerate(self.trucks):
+            for truck in self.trucks:
                 if truck.remaining_ldm >= ARRANGEMENT_LDM_VALUES[arrangement]:
                     truck.add_arrangement(arrangement)
                     placed = True
@@ -82,8 +82,8 @@ class TruckProcessor:
                 self.add_truck()
                 continue
             # Reduces loose_ldm_remaining by its own value or the free space on the last truck, whichever is smaller
-            reduce_by = min(loose_ldm_remaining, self.last_truck.remaining_ldm)
-            loose_ldm_remaining -= reduce_by
+            ldm_to_subtract = min(loose_ldm_remaining, self.last_truck.remaining_ldm)
+            loose_ldm_remaining -= ldm_to_subtract
             # If there are still loose pallets, adds a truck
             if loose_ldm_remaining > 0:
                 self.add_truck()
