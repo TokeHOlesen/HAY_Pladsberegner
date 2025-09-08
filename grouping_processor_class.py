@@ -9,28 +9,9 @@ class GroupingProcessor:
     Use self.progress for current progress during calculation.
     """
 
-    def __init__(self,
-                 no_of_60: int = 0,
-                 no_of_120: int = 0,
-                 no_of_145: int = 0,
-                 no_of_130: int = 0,
-                 no_of_17080: int = 0,
-                 no_of_17090: int = 0,
-                 no_of_23090: int = 0
-                 ):
+    def __init__(self):
         # Contains an element for each pallet, represented by an integer (fx. [120, 120, 17090])
         self.pallet_list = []
-        # Populates the pallet list
-        for count, value in [
-            (no_of_60, 60),
-            (no_of_120, 120),
-            (no_of_145, 145),
-            (no_of_130, 130),
-            (no_of_17080, 17080),
-            (no_of_17090, 17090),
-            (no_of_23090, 23090)
-        ]:
-            self.pallet_list.extend([value] * count)
         # A list holding all the calculated Grouping objects
         self.groupings = []
         # True if self.groupings contains at least one perfect grouping
@@ -39,6 +20,32 @@ class GroupingProcessor:
         self.progress: int = 0
         # The grouping to be used as the final solution
         self.best_grouping: Grouping = Grouping()
+
+    def load_pallets(self,
+                     no_60: int = 0,
+                     no_120: int = 0,
+                     no_145: int = 0,
+                     no_130: int = 0,
+                     no_17080: int = 0,
+                     no_17090: int = 0,
+                     no_23090: int = 0) -> None:
+        """Loads the amount of pallets and resets the results of any previous calculations."""
+        # When new pallets are loaded, resets everything
+        self.pallet_list = []
+        self.groupings = []
+        self.contains_perfect = False
+        self.progress = 0
+        # Populates the pallet list
+        for count, value in [
+            (no_60, 60),
+            (no_120, 120),
+            (no_145, 145),
+            (no_130, 130),
+            (no_17080, 17080),
+            (no_17090, 17090),
+            (no_23090, 23090)
+        ]:
+            self.pallet_list.extend([value] * count)
 
     # Generates all possible groupings and appends them to self.groupings[]
     def calculate_groupings(self) -> None:

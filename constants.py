@@ -12,7 +12,6 @@ PERMUTABLE_ARRANGEMENTS = (
     (17080, 120, 120, 60, 60),
     (120, 120, 60, 60),
     (17090, 60),
-    (130, 120, 120),
     (17080, 60)
 )
 
@@ -23,7 +22,8 @@ NON_PERMUTABLE_ARRANGEMENTS = (
     (145, 145, 145),
     (130, 130),
     (23090,),
-    (60, 60, 60)
+    (60, 60, 60),
+    (130, 120, 120)
 )
 
 # How much space each arrangement takes up (ldm * 100)
