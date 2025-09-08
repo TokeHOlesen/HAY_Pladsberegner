@@ -1,5 +1,5 @@
 from arrangement_collection_abstract_class import ArrangementCollection
-from constants import ARRANGEMENT_LDM_VALUES, ARRANGEMENT_ORDER
+from constants import ARRANGEMENT_ORDER
 
 
 class Truck(ArrangementCollection):
@@ -17,20 +17,6 @@ class Truck(ArrangementCollection):
     def number_of_loose_120(self) -> int:
         """Returns the number of 120 pallets in 'self.loose_pallets'."""
         return len(self.loose_pallets)
-
-    @property
-    def ldm_ascending_order(self) -> list[int]:
-        """Returns a list of the ldm values for all arrangements on this truck, in ascending order."""
-        ldm_ascending_list = []
-        for arrangement in self.arrangements:
-            ldm_ascending_list.append(ARRANGEMENT_LDM_VALUES[arrangement])
-        ldm_ascending_list.sort()
-        return ldm_ascending_list
-
-    @property
-    def ldm_descending_order(self) -> list[int]:
-        """Returns a list of the ldm values for all arrangements on this truck, in descending order."""
-        return self.ldm_ascending_order[::-1]
 
     def form_120_arrangements(self) -> None:
         """Forms (120, 120, 120) and (120, 120) arrangements from the loose 120 pallet pool."""

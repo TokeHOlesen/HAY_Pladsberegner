@@ -141,4 +141,3 @@ class GroupingProcessor:
         self.calculate_groupings()
         self.prune_groupings()
         self.set_best_grouping()
-        self.best_grouping.sort_arrangements()

@@ -1,5 +1,4 @@
 from arrangement_collection_abstract_class import ArrangementCollection
-from constants import ARRANGEMENT_LDM_VALUES
 
 
 class Grouping(ArrangementCollection):
@@ -30,9 +29,3 @@ class Grouping(ArrangementCollection):
             if pallet != 120:
                 return False
         return True
-
-    def sort_arrangements(self) -> None:
-        """Sorts the arrangements by size, in descending order."""
-        self.arrangements = sorted(self.arrangements,
-                                   key=lambda x: ARRANGEMENT_LDM_VALUES[x],
-                                   reverse=True)

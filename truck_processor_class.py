@@ -7,6 +7,7 @@ class TruckProcessor:
     """
     Distributes the arrangements and loose pallets between trucks. A Grouping object must be passed to the constructor.
     """
+
     def __init__(self, max_ldm=DEFAULT_MAX_TRUCK_LDM) -> None:
         # Holds objects of the Truck class, containing all pallets, sorted into arrangements
         self.trucks: list[Truck] = []
@@ -49,13 +50,16 @@ class TruckProcessor:
 
     def distribute_arrangements(self) -> None:
         """
-        Distributes arrangements between trucks, using the first-fit decreasing algorithm.
+        Distributes arrangements between trucks, using the best-fit decreasing algorithm.
         If there is no room on any of the existing trucks, adds a new one and places the arrangement there.
         """
-        # TODO: reimplement with best-fit decreasing algorithm
         self.add_truck()
-        for arrangement in self.arrangements:
+        for arrangement in sorted(self.arrangements,
+                                  key=lambda x: ARRANGEMENT_LDM_VALUES[x],
+                                  reverse=True):
             placed: bool = False
+            # Sorts the trucks by free ldm, with the most full trucks first
+            self.trucks.sort(key=lambda x: x.remaining_ldm)
             for truck in self.trucks:
                 if truck.remaining_ldm >= ARRANGEMENT_LDM_VALUES[arrangement]:
                     truck.add_arrangement(arrangement)
@@ -79,13 +83,14 @@ class TruckProcessor:
                 while (truck.total_ldm + PALLET_LDM_VALUES[120]) <= self.max_ldm and self.number_of_loose_120 >= 1:
                     truck.add_pallet(120)
                     self.loose_pallets.remove(120)
-        # Add more trucks if all the 120 palelts can't fit on existing ones
-        while self.number_of_loose_120 > 0:
-            self.add_truck()
-            number_to_add: int = min(33, self.number_of_loose_120)
-            self.last_truck.add_pallet(120, number_to_add)
-            for i in range(number_to_add):
-                self.loose_pallets.remove(120)
+        # Add more trucks if all the 120 pallets can't fit on existing ones
+        if self.number_of_loose_120 > 1:
+            while self.number_of_loose_120 > 0:
+                self.add_truck()
+                number_to_add: int = min(33, self.number_of_loose_120)
+                self.last_truck.add_pallet(120, number_to_add)
+                for i in range(number_to_add):
+                    self.loose_pallets.remove(120)
 
     def add_trucks_for_loose_pallets(self) -> None:
         """If the remaining loose pallets can't fit on the last truck, adds a new truck(s)."""

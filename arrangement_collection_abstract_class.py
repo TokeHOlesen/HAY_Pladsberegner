@@ -10,14 +10,6 @@ class ArrangementCollection:
         # A list of all loose pallets in this collection. Each pallet is represented by an integer
         self.loose_pallets: list[int] = []
 
-    def __contains__(self, item: int | tuple[int, ...]) -> bool:
-        if isinstance(item, tuple):
-            return item in self.arrangements
-        elif isinstance(item, int):
-            return item in self.loose_pallets
-        else:
-            exit(f"Error: {item} is neither tuple nor int.")
-
     @property
     def arrangements_ldm(self) -> int:
         """Returns the total ldm for all arrangements in this grouping."""
@@ -42,14 +34,6 @@ class ArrangementCollection:
     def add_arrangement(self, arrangement: tuple[int, ...], count: int = 1) -> None:
         """Appends a specified number of a certain arrangement to the "self.arrangements" list."""
         self.arrangements.extend([arrangement] * count)
-
-    def remove_arrangement(self, arrangement: tuple[int, ...], count: int = 1) -> None:
-        """Removes a specified number of a certain arrangement from the "self.arrangements" list."""
-        try:
-            for _ in range(count):
-                self.arrangements.remove(arrangement)
-        except ValueError:
-            exit(f"Error: this arrangement collection does not contain the arrangement '{arrangement}'.")
 
     def add_pallet(self, pallet: int, count: int = 1) -> None:
         """Appends a specified number of a certain pallet to the "self.loose_pallets" list."""
