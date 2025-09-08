@@ -8,7 +8,7 @@ def main():
     loose_pallets = load_calculator.loose_pallets
 
     for i, truck in enumerate(trucks):
-        print(f"\nTruck {i + 1}:")
+        print(f"\nTruck {i + 1} ({truck.total_ldm / 100} ldm):")
         for arrangement in truck.arrangements:
             print(arrangement)
 

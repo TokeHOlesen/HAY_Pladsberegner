@@ -81,21 +81,15 @@ class GroupingProcessor:
             # If there are any remaining loose pallets, adds them to the grouping's loose pallets list
             for pallet in pallet_list_copy:
                 new_grouping.add_pallet(pallet)
+            self.groupings.append(new_grouping)
+            # Breaks out of the loop if a perfect solution is found (no point trying other ones)
             if new_grouping.is_perfect:
                 self.contains_perfect = True
-                # TODO: stop as soon as a perfect grouping is found
-            self.groupings.append(new_grouping)
+                self.best_grouping = new_grouping
+                break
 
     def prune_groupings(self):
-        """
-        If a perfect grouping exists, removes all imperfect groupings.
-        Otherwise, keeps only the arrangements with the smallest loose pallet and arrangement ldm.
-        """
-        # TODO: stop as soon as one perfect solution is found
-        # Removes all imperfect groupings if at least one perfect grouping exist
-        if self.contains_perfect:
-            self.groupings[:] = [grouping for grouping in self.groupings if grouping.is_perfect]
-            return
+        """Keeps only the arrangements with the smallest loose pallet and arrangement ldm."""
         # Finds the lowest loose pallet ldm among the groupings and removes all groupings where it's higher
         lowest_loose_ldm = self.get_lowest_loose_ldm()
         self.groupings[:] = [grouping for grouping in self.groupings if grouping.loose_pallets_ldm == lowest_loose_ldm]
@@ -139,5 +133,6 @@ class GroupingProcessor:
     def process_groupings(self) -> None:
         """Forms groupings, prunes them, chooses the best one and sorts the arrangements on it."""
         self.calculate_groupings()
-        self.prune_groupings()
-        self.set_best_grouping()
+        if not self.contains_perfect:
+            self.prune_groupings()
+            self.set_best_grouping()
