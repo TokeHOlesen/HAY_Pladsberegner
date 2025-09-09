@@ -54,9 +54,12 @@ class GroupingProcessor:
         Appends arrangements from NON_PERMUTABLE_ARRANGEMENTS to each permutation.
         Later, calculates all possible groupings.
         """
+        permutable_arrangements = self.valid_arrangements_to_permute(PERMUTABLE_ARRANGEMENTS)
+        non_permutable_arrangements = self.valid_arrangements_to_permute(NON_PERMUTABLE_ARRANGEMENTS)
+
         all_permutations: tuple = tuple(
-            permutation + NON_PERMUTABLE_ARRANGEMENTS
-            for permutation in permutations(PERMUTABLE_ARRANGEMENTS, len(PERMUTABLE_ARRANGEMENTS))
+            permutation + non_permutable_arrangements
+            for permutation in permutations(permutable_arrangements, len(permutable_arrangements))
         )
 
         no_of_permutations = len(all_permutations)
@@ -87,6 +90,23 @@ class GroupingProcessor:
                 self.contains_perfect = True
                 self.best_grouping = new_grouping
                 break
+
+    def valid_arrangements_to_permute(self, arrangements: tuple[tuple]) -> tuple[tuple]:
+        """Returns a tuple of arrangments that can actually be formed using the available pallets."""
+        valid_arrangements = []
+        for arrangement in arrangements:
+            is_valid = True
+            pallet_list_copy = self.pallet_list.copy()
+            for pallet in arrangement:
+                if pallet not in pallet_list_copy:
+                    is_valid = False
+                    break
+                else:
+                    pallet_list_copy.remove(pallet)
+            if is_valid:
+                valid_arrangements.append(arrangement)
+        valid_arrangements = tuple(valid_arrangements)
+        return valid_arrangements
 
     def prune_groupings(self):
         """Keeps only the arrangements with the smallest loose pallet and arrangement ldm."""
