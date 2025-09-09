@@ -114,7 +114,7 @@ class GroupingProcessor:
     def set_best_grouping(self) -> None:
         """
         Sets self.best_grouping to self.groupings[0].
-        If used after pruning, the groupings that are left are equivalent, so the first one is used.
+        After pruning, the groupings that are left are equivalent, so the first one is used.
         """
         self.best_grouping = self.groupings[0]
 
