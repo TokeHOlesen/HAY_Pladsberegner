@@ -39,6 +39,11 @@ class TruckProcessor:
         return self.loose_pallets.count(120)
 
     @property
+    def number_of_loose_pallets(self) -> int:
+        """Returns the number of all loose pallets."""
+        return len(self.loose_pallets)
+
+    @property
     def ldm_of_loose_pallets(self) -> int:
         """Returns the ldm value of remaining loose pallets."""
         return sum(PALLET_LDM_VALUES[pallet] for pallet in self.loose_pallets)
@@ -53,7 +58,6 @@ class TruckProcessor:
         Distributes arrangements between trucks, using the best-fit decreasing algorithm.
         If there is no room on any of the existing trucks, adds a new one and places the arrangement there.
         """
-        self.add_truck()
         for arrangement in sorted(self.arrangements,
                                   key=lambda x: ARRANGEMENT_LDM_VALUES[x],
                                   reverse=True):

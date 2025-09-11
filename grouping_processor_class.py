@@ -21,6 +21,10 @@ class GroupingProcessor:
         # The grouping to be used as the final solution
         self.best_grouping: Grouping = Grouping()
 
+    @property
+    def number_of_pallets(self) -> int:
+        return len(self.pallet_list)
+
     def load_pallets(self,
                      no_60: int = 0,
                      no_120: int = 0,
@@ -54,6 +58,7 @@ class GroupingProcessor:
         Appends arrangements from NON_PERMUTABLE_ARRANGEMENTS to each permutation.
         Later, calculates all possible groupings.
         """
+        # Checks which arrangements can actually be formed with the given pallet list and only includes those
         permutable_arrangements = self.valid_arrangements_to_permute(PERMUTABLE_ARRANGEMENTS)
         non_permutable_arrangements = self.valid_arrangements_to_permute(NON_PERMUTABLE_ARRANGEMENTS)
 
@@ -105,8 +110,7 @@ class GroupingProcessor:
                     pallet_list_copy.remove(pallet)
             if is_valid:
                 valid_arrangements.append(arrangement)
-        valid_arrangements = tuple(valid_arrangements)
-        return valid_arrangements
+        return tuple(valid_arrangements)
 
     def prune_groupings(self):
         """Keeps only the arrangements with the smallest loose pallet and arrangement ldm."""

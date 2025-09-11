@@ -9,6 +9,14 @@ class Truck(ArrangementCollection):
         self.max_ldm: int = max_ldm
 
     @property
+    def number_of_pallets(self) -> int:
+        pallet_sum: int = 0
+        for arrangement in self.arrangements:
+            for pallet in arrangement:
+                pallet_sum += 1
+        return pallet_sum
+
+    @property
     def remaining_ldm(self) -> int:
         """Returns how much ldm is free on this truck."""
         return self.max_ldm - self.total_ldm
