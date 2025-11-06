@@ -3,7 +3,7 @@ from load_calculator_class import LoadCalculator
 
 def main():
     load_calculator = LoadCalculator()
-    load_calculator.load_pallets(*[0, 0, 5, 6, 0, 4, 0])
+    load_calculator.load_pallets(*[0, 302, 189, 56, 78, 121, 0])
     load_calculator.calculate_load()
     trucks = load_calculator.trucks
     loose_pallets = load_calculator.loose_pallets

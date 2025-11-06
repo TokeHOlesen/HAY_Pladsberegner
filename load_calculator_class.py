@@ -1,4 +1,4 @@
-from grouping_processor_class import GroupingProcessora
+from grouping_processor_class import GroupingProcessor
 from truck_processor_class import TruckProcessor
 
 
