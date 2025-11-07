@@ -43,6 +43,29 @@ class TruckView(QWidget):
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawRect(border_rect)
 
+    def generate_60_60_60(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        pallet_width_px = standard_pallet_width
+        pallet_height_px = border_rect.height() // 21 - (self.gutter * 2)
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.brush_offset += pallet_height_px + self.gutter
+
     def generate_120_120_120(self, standard_pallet_width, border_rect):
         initial_x = border_rect.left() + self.gutter
         initial_y = border_rect.top() + self.gutter + self.brush_offset
@@ -60,6 +83,206 @@ class TruckView(QWidget):
                                        pallet_height_px))
 
         self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.brush_offset += pallet_height_px + self.gutter
+
+    def generate_120_120(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        pallet_width_px = (border_rect.width() - self.gutter * 3) // 2
+        pallet_height_px = int(round(border_rect.height() / 16.1)) - (self.gutter * 2)
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.brush_offset += pallet_height_px + self.gutter
+
+    def generate_120_120_60_60(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        pallet_width_px = standard_pallet_width
+        p120_height_px = border_rect.height() // 11 - (self.gutter * 2)
+        p60_height_px = (p120_height_px - self.gutter) // 2
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       pallet_width_px,
+                                       p120_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
+                                       initial_y,
+                                       pallet_width_px,
+                                       p120_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
+                                       initial_y,
+                                       pallet_width_px,
+                                       p60_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
+                                       initial_y + p60_height_px + self.gutter,
+                                       pallet_width_px,
+                                       p60_height_px))
+
+        self.brush_offset += p120_height_px + self.gutter
+
+    def generate_120_60_60_60_60(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        pallet_width_px = standard_pallet_width
+        p120_height_px = border_rect.height() // 11 - (self.gutter * 2)
+        p60_height_px = (p120_height_px - self.gutter) // 2
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       pallet_width_px,
+                                       p120_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
+                                       initial_y,
+                                       pallet_width_px,
+                                       p60_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
+                                       initial_y,
+                                       pallet_width_px,
+                                       p60_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
+                                       initial_y + p60_height_px + self.gutter,
+                                       pallet_width_px,
+                                       p60_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
+                                       initial_y + p60_height_px + self.gutter,
+                                       pallet_width_px,
+                                       p60_height_px))
+
+        self.brush_offset += p120_height_px + self.gutter
+
+    def generate_145_145_145(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        pallet_width_px = standard_pallet_width
+        pallet_height_px = border_rect.height() // 9 - (self.gutter * 2)
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.brush_offset += pallet_height_px + self.gutter
+
+    def generate_17080_17080_17080(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        pallet_width_px = standard_pallet_width
+        pallet_height_px = int(round(border_rect.height() / 7.7)) - (self.gutter * 2)
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.brush_offset += pallet_height_px + self.gutter
+
+    def generate_130_130(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        pallet_width_px = (border_rect.width() - self.gutter * 3) // 2
+        pallet_height_px = int(round(border_rect.height() / 9.4)) - (self.gutter * 2)
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
+                                       initial_y,
+                                       pallet_width_px,
+                                       pallet_height_px))
+
+        self.brush_offset += pallet_height_px + self.gutter
+
+    def generate_17080_60(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        p17080_width_px = int(round((border_rect.width() - self.gutter * 3) / 1.35))
+        p60_width_px = (border_rect.width() - self.gutter * 3) // 4
+        pallet_height_px = int(round(border_rect.height() / 16.3)) - (self.gutter * 2)
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       p17080_width_px,
+                                       pallet_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + p17080_width_px + self.gutter,
+                                       initial_y,
+                                       p60_width_px,
+                                       pallet_height_px))
+
+        self.brush_offset += pallet_height_px + self.gutter
+
+    def generate_17090_60(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        p17090_width_px = int(round((border_rect.width() - self.gutter * 3) / 1.35))
+        p60_width_px = (border_rect.width() - self.gutter * 3) // 4
+        p17090_height_px = int(round(border_rect.height() / 14.5)) - (self.gutter * 2)
+        p60_height_px = int(round(border_rect.height() / 16.3)) - (self.gutter * 2)
+
+        self.pallet_rects.append(QRect(initial_x,
+                                       initial_y,
+                                       p17090_width_px,
+                                       p17090_height_px))
+
+        self.pallet_rects.append(QRect(initial_x + p17090_width_px + self.gutter,
+                                       initial_y,
+                                       p60_width_px,
+                                       p60_height_px))
+
+        self.brush_offset += p17090_height_px + self.gutter
+
+    def generate_23090(self, standard_pallet_width, border_rect):
+        initial_x = border_rect.left() + self.gutter
+        initial_y = border_rect.top() + self.gutter + self.brush_offset
+        pallet_width_px = (border_rect.width() - self.gutter * 2)
+        pallet_height_px = int(round(border_rect.height() / 14.5)) - (self.gutter * 2)
+        print(border_rect.width())
+        print(self.gutter)
+        print(pallet_width_px)
+
+        self.pallet_rects.append(QRect(initial_x,
                                        initial_y,
                                        pallet_width_px,
                                        pallet_height_px))
@@ -86,17 +309,8 @@ class TruckView(QWidget):
 
         self.pallet_rects = []
         self.brush_offset = 0
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
-        self.generate_120_120_120(standard_pallet_width, border_rect)
+        for _ in range(11):
+            self.generate_120_120_60_60(standard_pallet_width, border_rect)
 
         self.draw_pallets(painter)
 
