@@ -93,6 +93,7 @@ class TruckView(QWidget):
         initial_x = border_rect.left() + self.gutter
         initial_y = border_rect.top() + self.gutter + self.brush_offset
         pallet_width_px = (border_rect.width() - self.gutter * 3) // 2
+        pallet_last_width_px = border_rect.width() - pallet_width_px - self.gutter * 3
         pallet_height_px = int(round(border_rect.height() / 16.1)) - (self.gutter * 2)
 
         self.pallet_rects.append(QRect(initial_x,
@@ -102,7 +103,7 @@ class TruckView(QWidget):
 
         self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
                                        initial_y,
-                                       pallet_width_px,
+                                       pallet_last_width_px,
                                        pallet_height_px))
 
         self.brush_offset += pallet_height_px + self.gutter
@@ -113,6 +114,7 @@ class TruckView(QWidget):
         pallet_width_px = standard_pallet_width
         p120_height_px = border_rect.height() // 11 - (self.gutter * 2)
         p60_height_px = (p120_height_px - self.gutter) // 2
+        p60_last_height_px = p120_height_px - p60_height_px - self.gutter
 
         self.pallet_rects.append(QRect(initial_x,
                                        initial_y,
@@ -132,7 +134,7 @@ class TruckView(QWidget):
         self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
                                        initial_y + p60_height_px + self.gutter,
                                        pallet_width_px,
-                                       p60_height_px))
+                                       p60_last_height_px))
 
         self.brush_offset += p120_height_px + self.gutter
 
@@ -142,7 +144,7 @@ class TruckView(QWidget):
         pallet_width_px = standard_pallet_width
         p170_height_px = int(round(border_rect.height() / 7.45)) - (self.gutter * 2)
         p120_height_px = border_rect.height() // 11 - (self.gutter * 2)
-        p60_height_px = (p120_height_px - self.gutter) // 2
+        p60_height_px = p170_height_px - p120_height_px - self.gutter
 
         self.pallet_rects.append(QRect(initial_x,
                                        initial_y,
@@ -172,7 +174,7 @@ class TruckView(QWidget):
         pallet_width_px = standard_pallet_width
         p170_height_px = int(round(border_rect.height() / 7.45)) - (self.gutter * 2)
         p120_height_px = border_rect.height() // 11 - (self.gutter * 2)
-        p60_height_px = (p120_height_px - self.gutter) // 2
+        p60_height_px = p170_height_px - p120_height_px - self.gutter
 
         self.pallet_rects.append(QRect(initial_x,
                                        initial_y,
@@ -207,6 +209,7 @@ class TruckView(QWidget):
         pallet_width_px = standard_pallet_width
         p120_height_px = border_rect.height() // 11 - (self.gutter * 2)
         p60_height_px = (p120_height_px - self.gutter) // 2
+        p60_last_height_px = p120_height_px - p60_height_px - self.gutter
 
         self.pallet_rects.append(QRect(initial_x,
                                        initial_y,
@@ -226,12 +229,12 @@ class TruckView(QWidget):
         self.pallet_rects.append(QRect(initial_x + pallet_width_px + self.gutter,
                                        initial_y + p60_height_px + self.gutter,
                                        pallet_width_px,
-                                       p60_height_px))
+                                       p60_last_height_px))
 
         self.pallet_rects.append(QRect(initial_x + 2 * (pallet_width_px + self.gutter),
                                        initial_y + p60_height_px + self.gutter,
                                        pallet_width_px,
-                                       p60_height_px))
+                                       p60_last_height_px))
 
         self.brush_offset += p120_height_px + self.gutter
 
@@ -285,7 +288,7 @@ class TruckView(QWidget):
         initial_x = border_rect.left() + self.gutter
         initial_y = border_rect.top() + self.gutter + self.brush_offset
         p17090_width_px = int(round((border_rect.width() - self.gutter * 2) / 2.7))
-        p145_width_px = int(round((border_rect.width() - self.gutter * 2) / 1.65))
+        p145_width_px = border_rect.width() - p17090_width_px - self.gutter * 3
         p17090_height_px = int(round(border_rect.height() / 7.45)) - (self.gutter * 2)
         p145_height_px = border_rect.height() // 15 - (self.gutter * 2)
 
@@ -313,6 +316,7 @@ class TruckView(QWidget):
         p130_width_px = border_rect.width() - p17090_width_px - self.gutter * 3
         p17090_height_px = int(round(border_rect.height() / 7.45)) - (self.gutter * 2)
         p130_height_px = int(round((p17090_height_px * 2 - self.gutter) / 3))
+        p130_last_height_px = (p17090_height_px * 2 + self.gutter) - (p130_height_px + self.gutter) * 2
 
         self.pallet_rects.append(QRect(initial_x,
                                        initial_y,
@@ -337,9 +341,9 @@ class TruckView(QWidget):
         self.pallet_rects.append(QRect(initial_x + p17090_width_px + self.gutter,
                                        initial_y + (p130_height_px + self.gutter) * 2,
                                        p130_width_px,
-                                       p130_height_px))
+                                       p130_last_height_px))
 
-        self.brush_offset += max((p17090_height_px + self.gutter) * 2, (p130_height_px + self.gutter) * 3)
+        self.brush_offset += (p17090_height_px + self.gutter) * 2
 
     def generate_130_120_120(self, standard_pallet_width, border_rect):
         initial_x = border_rect.left() + self.gutter
@@ -388,7 +392,7 @@ class TruckView(QWidget):
         initial_x = border_rect.left() + self.gutter
         initial_y = border_rect.top() + self.gutter + self.brush_offset
         p17080_width_px = int(round((border_rect.width() - self.gutter * 3) / 1.35))
-        p60_width_px = (border_rect.width() - self.gutter * 3) // 4
+        p60_width_px = border_rect.width() - p17080_width_px - self.gutter * 3
         pallet_height_px = int(round(border_rect.height() / 16.3)) - (self.gutter * 2)
 
         self.pallet_rects.append(QRect(initial_x,
@@ -407,7 +411,7 @@ class TruckView(QWidget):
         initial_x = border_rect.left() + self.gutter
         initial_y = border_rect.top() + self.gutter + self.brush_offset
         p17090_width_px = int(round((border_rect.width() - self.gutter * 3) / 1.35))
-        p60_width_px = (border_rect.width() - self.gutter * 3) // 4
+        p60_width_px = border_rect.width() - p17090_width_px - self.gutter * 3
         p17090_height_px = int(round(border_rect.height() / 14.5)) - (self.gutter * 2)
         p60_height_px = int(round(border_rect.height() / 16.3)) - (self.gutter * 2)
 
@@ -428,9 +432,6 @@ class TruckView(QWidget):
         initial_y = border_rect.top() + self.gutter + self.brush_offset
         pallet_width_px = border_rect.width() - self.gutter * 2
         pallet_height_px = int(round(border_rect.height() / 14.5)) - (self.gutter * 2)
-        print(border_rect.width())
-        print(self.gutter)
-        print(pallet_width_px)
 
         self.pallet_rects.append(QRect(initial_x,
                                        initial_y,
@@ -461,6 +462,11 @@ class TruckView(QWidget):
         self.brush_offset = 0
         self.generate_17090_17090_130_130_130(standard_pallet_width, border_rect)
         self.generate_120_120_60_60(standard_pallet_width, border_rect)
+        self.generate_17080_17080_120_60(standard_pallet_width, border_rect)
+        self.generate_17080_120_120_60_60(standard_pallet_width, border_rect)
+        self.generate_120_60_60_60_60(standard_pallet_width, border_rect)
+        self.generate_17080_60(standard_pallet_width, border_rect)
+        self.generate_17090_145_145(standard_pallet_width, border_rect)
         self.generate_130_120_120(standard_pallet_width, border_rect)
 
         self.draw_pallets(painter)
