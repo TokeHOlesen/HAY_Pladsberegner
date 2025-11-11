@@ -1,359 +1,360 @@
 from PyQt6.QtCore import QRect
 
 
-def generate_60_60_60(x, y, standard_pallet_width, border_rect, gutter):
-    pallet_width_px = standard_pallet_width
-    pallet_height_px = border_rect.height() // 21 - (gutter * 2)
+def generate_60_60_60(x, y, _, gutter, dimensions):
+    p60_width = dimensions["standard_width"]
+    p60_height = dimensions["v-60-height"]
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          p60_width,
+                          p60_height),
+                    QRect(x + p60_width + gutter,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
+                          p60_width,
+                          p60_height),
+                    QRect(x + 2 * (p60_width + gutter),
                           y,
-                          pallet_width_px,
-                          pallet_height_px)]
+                          p60_width,
+                          p60_height)]
 
-    new_brush_offset = pallet_height_px + gutter
+    new_brush_offset = p60_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_120_120_120(x, y, standard_pallet_width, border_rect, gutter):
-    pallet_width_px = standard_pallet_width
-    pallet_height_px = border_rect.height() // 11 - (gutter * 2)
+def generate_120_120_120(x, y, _, gutter, dimensions):
+    p120_width = dimensions["standard_width"]
+    p120_height = dimensions["v-120-height"]
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          p120_width,
+                          p120_height),
+                    QRect(x + p120_width + gutter,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
+                          p120_width,
+                          p120_height),
+                    QRect(x + 2 * (p120_width + gutter),
                           y,
-                          pallet_width_px,
-                          pallet_height_px)]
+                          p120_width,
+                          p120_height)]
 
-    new_brush_offset = pallet_height_px + gutter
+    new_brush_offset = p120_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_120_120(x, y, _, border_rect, gutter):
-    pallet_width_px = (border_rect.width() - gutter * 3) // 2
-    pallet_height_px = int(round(border_rect.height() / 16.1)) - (gutter * 2)
-    pallet_last_width_px = border_rect.width() - pallet_width_px - gutter * 3
+def generate_120_120(x, y, border_rect, gutter, dimensions):
+    p120_width = dimensions["h-120-width"]
+    p120_height = dimensions["h-120-height"]
+    p120_last_width = border_rect.width() - p120_width - gutter * 3
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          p120_width,
+                          p120_height),
+                    QRect(x + p120_width + gutter,
                           y,
-                          pallet_last_width_px,
-                          pallet_height_px)]
+                          p120_last_width,
+                          p120_height)]
 
-    new_brush_offset = pallet_height_px + gutter
+    new_brush_offset = p120_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_120_120_60_60(x, y, standard_pallet_width, border_rect, gutter):
-    pallet_width_px = standard_pallet_width
-    p120_height_px = border_rect.height() // 11 - (gutter * 2)
-    p60_height_px = (p120_height_px - gutter) // 2
-    p60_last_height_px = p120_height_px - p60_height_px - gutter
+def generate_120_120_60_60(x, y, _, gutter, dimensions):
+    p120_width = dimensions["standard_width"]
+    p120_height = dimensions["v-120-height"]
+    p60_height = (p120_height - gutter) // 2
+    p60_last_height = p120_height - p60_height - gutter
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          p120_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          p120_width,
+                          p120_height),
+                    QRect(x + p120_width + gutter,
                           y,
-                          pallet_width_px,
-                          p120_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
+                          p120_width,
+                          p120_height),
+                    QRect(x + 2 * (p120_width + gutter),
                           y,
-                          pallet_width_px,
-                          p60_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
-                          y + p60_height_px + gutter,
-                          pallet_width_px,
-                          p60_last_height_px)]
+                          p120_width,
+                          p60_height),
+                    QRect(x + 2 * (p120_width + gutter),
+                          y + p60_height + gutter,
+                          p120_width,
+                          p60_last_height)]
 
-    new_brush_offset = p120_height_px + gutter
+    new_brush_offset = p120_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_17080_17080_120_60(x, y, standard_pallet_width, border_rect, gutter):
-    pallet_width_px = standard_pallet_width
-    p170_height_px = int(round(border_rect.height() / 7.45)) - (gutter * 2)
-    p120_height_px = border_rect.height() // 11 - (gutter * 2)
-    p60_height_px = p170_height_px - p120_height_px - gutter
+def generate_17080_17080_120_60(x, y, _, gutter, dimensions):
+    pallet_width = dimensions["standard_width"]
+    p170_height = dimensions["v-17080-height"]
+    p120_height = dimensions["v-120-height"]
+    p60_height = p170_height - p120_height - gutter
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          p170_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          pallet_width,
+                          p170_height),
+                    QRect(x + pallet_width + gutter,
                           y,
-                          pallet_width_px,
-                          p170_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
+                          pallet_width,
+                          p170_height),
+                    QRect(x + 2 * (pallet_width + gutter),
                           y,
-                          pallet_width_px,
-                          p120_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
-                          y + p120_height_px + gutter,
-                          pallet_width_px,
-                          p60_height_px)]
+                          pallet_width,
+                          p120_height),
+                    QRect(x + 2 * (pallet_width + gutter),
+                          y + p120_height + gutter,
+                          pallet_width,
+                          p60_height)]
 
-    new_brush_offset = p170_height_px + gutter
+    new_brush_offset = p170_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_17080_120_120_60_60(x, y, standard_pallet_width, border_rect, gutter):
-    pallet_width_px = standard_pallet_width
-    p170_height_px = int(round(border_rect.height() / 7.45)) - (gutter * 2)
-    p120_height_px = border_rect.height() // 11 - (gutter * 2)
-    p60_height_px = p170_height_px - p120_height_px - gutter
+def generate_17080_120_120_60_60(x, y, _, gutter, dimensions):
+    pallet_width = dimensions["standard_width"]
+    p170_height = dimensions["v-17080-height"]
+    p120_height = dimensions["v-120-height"]
+    p60_height = p170_height - p120_height - gutter
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          p170_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          pallet_width,
+                          p170_height),
+                    QRect(x + pallet_width + gutter,
                           y,
-                          pallet_width_px,
-                          p120_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
+                          pallet_width,
+                          p120_height),
+                    QRect(x + 2 * (pallet_width + gutter),
                           y,
-                          pallet_width_px,
-                          p120_height_px),
-                    QRect(x + pallet_width_px + gutter,
-                          y + p120_height_px + gutter,
-                          pallet_width_px,
-                          p60_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
-                          y + p120_height_px + gutter,
-                          pallet_width_px,
-                          p60_height_px)]
+                          pallet_width,
+                          p120_height),
+                    QRect(x + pallet_width + gutter,
+                          y + p120_height + gutter,
+                          pallet_width,
+                          p60_height),
+                    QRect(x + 2 * (pallet_width + gutter),
+                          y + p120_height + gutter,
+                          pallet_width,
+                          p60_height)]
 
-    new_brush_offset = p170_height_px + gutter
+    new_brush_offset = p170_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_120_60_60_60_60(x, y, standard_pallet_width, border_rect, gutter):
-    pallet_width_px = standard_pallet_width
-    p120_height_px = border_rect.height() // 11 - (gutter * 2)
-    p60_height_px = (p120_height_px - gutter) // 2
-    p60_last_height_px = p120_height_px - p60_height_px - gutter
+def generate_120_60_60_60_60(x, y, _, gutter, dimensions):
+    pallet_width = dimensions["standard_width"]
+    p120_height = dimensions["v-120-height"]
+    p60_height = (p120_height - gutter) // 2
+    p60_last_height = p120_height - p60_height - gutter
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          p120_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          pallet_width,
+                          p120_height),
+                    QRect(x + pallet_width + gutter,
                           y,
-                          pallet_width_px,
-                          p60_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
+                          pallet_width,
+                          p60_height),
+                    QRect(x + 2 * (pallet_width + gutter),
                           y,
-                          pallet_width_px,
-                          p60_height_px),
-                    QRect(x + pallet_width_px + gutter,
-                          y + p60_height_px + gutter,
-                          pallet_width_px,
-                          p60_last_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
-                          y + p60_height_px + gutter,
-                          pallet_width_px,
-                          p60_last_height_px)]
+                          pallet_width,
+                          p60_height),
+                    QRect(x + pallet_width + gutter,
+                          y + p60_height + gutter,
+                          pallet_width,
+                          p60_last_height),
+                    QRect(x + 2 * (pallet_width + gutter),
+                          y + p60_height + gutter,
+                          pallet_width,
+                          p60_last_height)]
 
-    new_brush_offset = p120_height_px + gutter
+    new_brush_offset = p120_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_145_145_145(x, y, standard_pallet_width, border_rect, gutter):
-    pallet_width_px = standard_pallet_width
-    pallet_height_px = border_rect.height() // 9 - (gutter * 2)
+def generate_145_145_145(x, y, _, gutter, dimensions):
+    p145_width = dimensions["standard_width"]
+    p145_height = dimensions["v-145-height"]
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          p145_width,
+                          p145_height),
+                    QRect(x + p145_width + gutter,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
+                          p145_width,
+                          p145_height),
+                    QRect(x + 2 * (p145_width + gutter),
                           y,
-                          pallet_width_px,
-                          pallet_height_px)]
+                          p145_width,
+                          p145_height)]
 
-    new_brush_offset = pallet_height_px + gutter
+    new_brush_offset = p145_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_17080_17080_17080(x, y, standard_pallet_width, border_rect, gutter):
-    pallet_width_px = standard_pallet_width
-    pallet_height_px = int(round(border_rect.height() / 7.45)) - (gutter * 2)
+def generate_17080_17080_17080(x, y, _, gutter, dimensions):
+    p17080_width = dimensions["standard_width"]
+    p17080_height = dimensions["v-17080-height"]
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          p17080_width,
+                          p17080_height),
+                    QRect(x + p17080_width + gutter,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + 2 * (pallet_width_px + gutter),
+                          p17080_width,
+                          p17080_height),
+                    QRect(x + 2 * (p17080_width + gutter),
                           y,
-                          pallet_width_px,
-                          pallet_height_px)]
+                          p17080_width,
+                          p17080_height)]
 
-    new_brush_offset = pallet_height_px + gutter
+    new_brush_offset = p17080_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_17090_145_145(x, y, _, border_rect, gutter):
-    p17090_width_px = int(round((border_rect.width() - gutter * 2) / 2.7))
-    p145_width_px = border_rect.width() - p17090_width_px - gutter * 3
-    p17090_height_px = int(round(border_rect.height() / 7.45)) - (gutter * 2)
-    p145_height_px = border_rect.height() // 15 - (gutter * 2)
+def generate_17090_145_145(x, y, border_rect, gutter, dimensions):
+    p17090_width = dimensions["v-17090-width"]
+    p17090_height = dimensions["v-17080-height"]
+    p145_width = border_rect.width() - p17090_width - gutter * 3
+    p145_height = dimensions["h-145-height"]
 
     pallet_rects = [QRect(x,
                           y,
-                          p17090_width_px,
-                          p17090_height_px),
-                    QRect(x + p17090_width_px + gutter,
+                          p17090_width,
+                          p17090_height),
+                    QRect(x + p17090_width + gutter,
                           y,
-                          p145_width_px,
-                          p145_height_px),
-                    QRect(x + p17090_width_px + gutter,
-                          y + p145_height_px + gutter,
-                          p145_width_px,
-                          p145_height_px)]
+                          p145_width,
+                          p145_height),
+                    QRect(x + p17090_width + gutter,
+                          y + p145_height + gutter,
+                          p145_width,
+                          p145_height)]
 
-    new_brush_offset = p17090_height_px + gutter
+    new_brush_offset = p17090_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_17090_17090_130_130_130(x, y, _, border_rect, gutter):
-    p17090_width_px = int(round((border_rect.width() - gutter * 2) / 2.7))
-    p130_width_px = border_rect.width() - p17090_width_px - gutter * 3
-    p17090_height_px = int(round(border_rect.height() / 7.45)) - (gutter * 2)
-    p130_height_px = int(round((p17090_height_px * 2 - gutter) / 3))
-    p130_last_height_px = (p17090_height_px * 2 + gutter) - (p130_height_px + gutter) * 2
+def generate_17090_17090_130_130_130(x, y, border_rect, gutter, dimensions):
+    p17090_width = dimensions["v-17090-width"]
+    p17090_height = dimensions["v-17080-height"]
+    p130_width = border_rect.width() - p17090_width - gutter * 3
+    p130_height = int(round((p17090_height * 2 - gutter) / 3))
+    p130_last_height = (p17090_height * 2 + gutter) - (p130_height + gutter) * 2
 
     pallet_rects = [QRect(x,
                           y,
-                          p17090_width_px,
-                          p17090_height_px),
+                          p17090_width,
+                          p17090_height),
                     QRect(x,
-                          y + p17090_height_px + gutter,
-                          p17090_width_px,
-                          p17090_height_px),
-                    QRect(x + p17090_width_px + gutter,
+                          y + p17090_height + gutter,
+                          p17090_width,
+                          p17090_height),
+                    QRect(x + p17090_width + gutter,
                           y,
-                          p130_width_px,
-                          p130_height_px),
-                    QRect(x + p17090_width_px + gutter,
-                          y + p130_height_px + gutter,
-                          p130_width_px,
-                          p130_height_px),
-                    QRect(x + p17090_width_px + gutter,
-                          y + (p130_height_px + gutter) * 2,
-                          p130_width_px,
-                          p130_last_height_px)]
+                          p130_width,
+                          p130_height),
+                    QRect(x + p17090_width + gutter,
+                          y + p130_height + gutter,
+                          p130_width,
+                          p130_height),
+                    QRect(x + p17090_width + gutter,
+                          y + (p130_height + gutter) * 2,
+                          p130_width,
+                          p130_last_height)]
 
-    new_brush_offset = (p17090_height_px + gutter) * 2
+    new_brush_offset = (p17090_height + gutter) * 2
     return pallet_rects, new_brush_offset
 
 
-def generate_130_120_120(x, y, _, border_rect, gutter):
-    p130_width_px = (border_rect.width() - gutter * 3) // 2
-    p120_width_px = border_rect.width() - p130_width_px - gutter * 3
-    p130_height_px = int(round(border_rect.height() / 9.4)) - (gutter * 2)
-    p120_height_px = int(round(border_rect.height() / 16.1)) - (gutter * 2)
+def generate_130_120_120(x, y, border_rect, gutter, dimensions):
+    p130_width = dimensions["v-130-width"]
+    p130_height = dimensions["v-130-height"]
+    p120_width = border_rect.width() - p130_width - gutter * 3
+    p120_height = dimensions["h-120-height"]
 
     pallet_rects = [QRect(x,
                           y,
-                          p130_width_px,
-                          p130_height_px),
-                    QRect(x + p130_width_px + gutter,
+                          p130_width,
+                          p130_height),
+                    QRect(x + p130_width + gutter,
                           y,
-                          p120_width_px,
-                          p120_height_px),
-                    QRect(x + p130_width_px + gutter,
-                          y + p120_height_px + gutter,
-                          p120_width_px,
-                          p120_height_px)]
+                          p120_width,
+                          p120_height),
+                    QRect(x + p130_width + gutter,
+                          y + p120_height + gutter,
+                          p120_width,
+                          p120_height)]
 
-    new_brush_offset = (p120_height_px * 2) + (gutter * 2)
+    new_brush_offset = (p120_height * 2) + (gutter * 2)
     return pallet_rects, new_brush_offset
 
 
-def generate_130_130(x, y, _, border_rect, gutter):
-    pallet_width_px = (border_rect.width() - gutter * 3) // 2
-    pallet_height_px = int(round(border_rect.height() / 9.4)) - (gutter * 2)
+def generate_130_130(x, y, border_rect, gutter, dimensions):
+    p130_width = dimensions["v-130-width"]
+    p130_height = dimensions["v-130-height"]
+    p130_last_width = border_rect.width() - p130_width - gutter * 3
 
     pallet_rects = [QRect(x,
                           y,
-                          pallet_width_px,
-                          pallet_height_px),
-                    QRect(x + pallet_width_px + gutter,
+                          p130_width,
+                          p130_height),
+                    QRect(x + p130_width + gutter,
                           y,
-                          pallet_width_px,
-                          pallet_height_px)]
+                          p130_last_width,
+                          p130_height)]
 
-    new_brush_offset = pallet_height_px + gutter
+    new_brush_offset = p130_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_17080_60(x, y, _, border_rect, gutter):
-    p17080_width_px = int(round((border_rect.width() - gutter * 3) / 1.35))
-    p60_width_px = border_rect.width() - p17080_width_px - gutter * 3
-    pallet_height_px = int(round(border_rect.height() / 16.3)) - (gutter * 2)
+def generate_17080_60(x, y, border_rect, gutter, dimensions):
+    p17080_width = dimensions["h-17080-width"]
+    p60_width = border_rect.width() - p17080_width - gutter * 3
+    pallet_height = dimensions["h-17080-height"]
 
     pallet_rects = [QRect(x,
                           y,
-                          p17080_width_px,
-                          pallet_height_px),
-                    QRect(x + p17080_width_px + gutter,
+                          p17080_width,
+                          pallet_height),
+                    QRect(x + p17080_width + gutter,
                           y,
-                          p60_width_px,
-                          pallet_height_px)]
+                          p60_width,
+                          pallet_height)]
 
-    new_brush_offset = pallet_height_px + gutter
+    new_brush_offset = pallet_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_17090_60(x, y, _, border_rect, gutter):
-    p17090_width_px = int(round((border_rect.width() - gutter * 3) / 1.35))
-    p60_width_px = border_rect.width() - p17090_width_px - gutter * 3
-    p17090_height_px = int(round(border_rect.height() / 14.5)) - (gutter * 2)
-    p60_height_px = int(round(border_rect.height() / 16.3)) - (gutter * 2)
+def generate_17090_60(x, y, border_rect, gutter, dimensions):
+    p17090_width = dimensions["h-17090-width"]
+    p17090_height = dimensions["h-17090-height"]
+    p60_width = border_rect.width() - p17090_width - gutter * 3
+    p60_height = dimensions["h-60-height"]
 
     pallet_rects = [QRect(x,
                           y,
-                          p17090_width_px,
-                          p17090_height_px),
-                    QRect(x + p17090_width_px + gutter,
+                          p17090_width,
+                          p17090_height),
+                    QRect(x + p17090_width + gutter,
                           y,
-                          p60_width_px,
-                          p60_height_px)]
+                          p60_width,
+                          p60_height)]
 
-    new_brush_offset = p17090_height_px + gutter
+    new_brush_offset = p17090_height + gutter
     return pallet_rects, new_brush_offset
 
 
-def generate_23090(x, y, _, border_rect, gutter):
-    pallet_width_px = border_rect.width() - gutter * 2
-    pallet_height_px = int(round(border_rect.height() / 14.5)) - (gutter * 2)
+def generate_23090(x, y, _, gutter, dimensions):
+    pallet_width_px = dimensions["h-23090-width"]
+    pallet_height_px = dimensions["h-23090-height"]
 
     pallet_rects = [QRect(x,
                           y,

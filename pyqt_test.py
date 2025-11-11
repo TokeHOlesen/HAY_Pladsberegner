@@ -20,6 +20,48 @@ class TruckView(QWidget):
         self.gutter = self.width() // 110
         self.standard_pallet_width = 0
         self.border_rect = None
+        self.pallet_rect_dimensions = {
+            "standard_width": 0,
+            "v-60-height": 0,
+            "h-60-height": 0,
+            "v-120-height": 0,
+            "h-120-height": 0,
+            "h-120-width": 0,
+            "v-130-height": 0,
+            "v-130-width": 0,
+            "v-145-height": 0,
+            "h-145-height": 0,
+            "v-17080-height": 0,
+            "h-17080-height": 0,
+            "h-17080-width": 0,
+            "v-17090-height": 0,
+            "v-17090-width": 0,
+            "h-17090-height": 0,
+            "h-17090-width": 0,
+            "h-23090-height": 0,
+            "h-23090-width": 0
+        }
+
+    def update_pallet_rect_dimensions(self):
+        self.pallet_rect_dimensions["standard_width"] = self.standard_pallet_width
+        self.pallet_rect_dimensions["v-60-height"] = self.border_rect.height() // 21 - (self.gutter * 2)
+        self.pallet_rect_dimensions["h-60-height"] = int(round(self.border_rect.height() / 16.3)) - (self.gutter * 2)
+        self.pallet_rect_dimensions["v-120-height"] = self.border_rect.height() // 11 - (self.gutter * 2)
+        self.pallet_rect_dimensions["h-120-height"] = int(round(self.border_rect.height() / 16.1)) - (self.gutter * 2)
+        self.pallet_rect_dimensions["h-120-width"] = (self.border_rect.width() - self.gutter * 3) // 2
+        self.pallet_rect_dimensions["v-130-height"] = int(round(self.border_rect.height() / 9.4)) - (self.gutter * 2)
+        self.pallet_rect_dimensions["v-130-width"] = (self.border_rect.width() - self.gutter * 3) // 2
+        self.pallet_rect_dimensions["v-145-height"] = self.border_rect.height() // 9 - (self.gutter * 2)
+        self.pallet_rect_dimensions["h-145-height"] = self.border_rect.height() // 15 - (self.gutter * 2)
+        self.pallet_rect_dimensions["v-17080-height"] = int(round(self.border_rect.height() / 7.45)) - (self.gutter * 2)
+        self.pallet_rect_dimensions["h-17080-height"] = int(round(self.border_rect.height() / 16.3)) - (self.gutter * 2)
+        self.pallet_rect_dimensions["h-17080-width"] = int(round((self.border_rect.width() - self.gutter * 3) / 1.35))
+        self.pallet_rect_dimensions["v-17090-height"] = int(round(self.border_rect.height() / 7.45)) - (self.gutter * 2)
+        self.pallet_rect_dimensions["v-17090-width"] = int(round((self.border_rect.width() - self.gutter * 2) / 2.7))
+        self.pallet_rect_dimensions["h-17090-height"] = int(round(self.border_rect.height() / 14.5)) - (self.gutter * 2)
+        self.pallet_rect_dimensions["h-17090-width"] = int(round((self.border_rect.width() - self.gutter * 3) / 1.35))
+        self.pallet_rect_dimensions["h-23090-height"] = int(round(self.border_rect.height() / 14.5)) - (self.gutter * 2)
+        self.pallet_rect_dimensions["h-23090-width"] = self.border_rect.width() - self.gutter * 2
 
     def update_standard_pallet_width(self):
         pallet_width = self.width() - 4 * self.gutter // 3
@@ -46,9 +88,9 @@ class TruckView(QWidget):
         y = self.border_rect.top() + self.gutter + self.brush_offset
         generated_pallet_rects, new_brush_offset = arr_rect_gen.generate[arrangement](x,
                                                                                       y,
-                                                                                      self.standard_pallet_width,
                                                                                       self.border_rect,
-                                                                                      self.gutter)
+                                                                                      self.gutter,
+                                                                                      self.pallet_rect_dimensions)
 
         self.pallet_rects.extend(generated_pallet_rects)
         self.brush_offset += new_brush_offset
@@ -67,12 +109,18 @@ class TruckView(QWidget):
         self.gutter = self.height() // 200
         self.update_standard_pallet_width()
         self.update_border_rect()
+        self.update_pallet_rect_dimensions()
 
         self.pallet_rects = []
         self.brush_offset = 0
-        self.generate_arrangement((60, 60, 60))
-        self.generate_arrangement((120, 120, 120))
+        self.generate_arrangement((17090, 60))
+        self.generate_arrangement((145, 145, 145))
+        self.generate_arrangement((17080, 17080, 17080))
         self.generate_arrangement((120, 120))
+        self.generate_arrangement((120, 60, 60, 60, 60))
+        self.generate_arrangement((17090, 145, 145))
+        self.generate_arrangement((130, 130))
+        self.generate_arrangement((23090, ))
 
         self.draw_border_rect(painter)
         self.draw_pallets(painter)
