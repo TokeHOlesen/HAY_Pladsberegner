@@ -1,5 +1,6 @@
 import sys
 import arrangement_rect_generator as arr_rect_gen
+from pallet_rect_class import PalletRect
 from PyQt6.QtCore import Qt, QRect
 from PyQt6.QtGui import QPainter, QPen, QColor
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow
@@ -17,7 +18,7 @@ class TruckView(QWidget):
         self.y_pos = 4
         self.brush_offset = 0
         self.pallet_rects = []
-        self.gutter = self.width() // 110
+        self.gutter = self.height() // 200
         self.standard_pallet_width = 0
         self.border_rect = None
         self.pallet_rect_dimensions = {
@@ -43,6 +44,7 @@ class TruckView(QWidget):
         }
 
     def update_pallet_rect_dimensions(self):
+        # TODO: Add variables for border rect width and height, adjust functions
         self.pallet_rect_dimensions["standard_width"] = self.standard_pallet_width
         self.pallet_rect_dimensions["v-60-height"] = self.border_rect.height() // 21 - (self.gutter * 2)
         self.pallet_rect_dimensions["h-60-height"] = int(round(self.border_rect.height() / 16.3)) - (self.gutter * 2)
@@ -95,11 +97,9 @@ class TruckView(QWidget):
         self.pallet_rects.extend(generated_pallet_rects)
         self.brush_offset += new_brush_offset
 
-    def draw_pallets(self, painter):
-        fill_color = QColor("#87c6ff")
-
+    def draw_arrangements(self, painter):
         for pallet in self.pallet_rects:
-            painter.fillRect(pallet, fill_color)
+            painter.fillRect(pallet, pallet.color)
             painter.setPen(QPen(QColor("black"), 1))
             painter.drawRect(pallet)
 
@@ -123,7 +123,7 @@ class TruckView(QWidget):
         self.generate_arrangement((23090, ))
 
         self.draw_border_rect(painter)
-        self.draw_pallets(painter)
+        self.draw_arrangements(painter)
 
         painter.end()
 
