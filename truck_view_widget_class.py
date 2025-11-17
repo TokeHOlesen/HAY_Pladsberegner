@@ -1,8 +1,9 @@
 import sys
 import arrangement_rect_generator as arr_rect_gen
 from PyQt6.QtCore import QRect
-from PyQt6.QtGui import QPainter, QPen, QColor
+from PyQt6.QtGui import QPainter, QPen, QColor, QPageSize
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow
+from PyQt6.QtPrintSupport import QPrinter
 
 RELATIVE_HEIGHT = 13.6
 RELATIVE_WIDTH = 2.4
@@ -94,40 +95,71 @@ class TruckView(QWidget):
         self.pallet_rects.extend(generated_pallet_rects)
         self.brush_offset += brush_offset
 
-    def draw_border_rect(self, painter):
+    def draw_border_rect(self, painter, border_thickness):
         """Draws the border rectangle."""
         painter.fillRect(self.border_rect, QColor("white"))
-        painter.setPen(QPen(QColor("black"), 1))
+        painter.setPen(QPen(QColor("black"), border_thickness))
         painter.drawRect(self.border_rect)
 
-    def draw_arrangements(self, painter):
+    def draw_arrangements(self, painter, border_thickness):
         """Draws all the pallets (PalletRect objects) in self.pallet_rects."""
         for pallet in self.pallet_rects:
             painter.fillRect(pallet, pallet.color)
-            painter.setPen(QPen(QColor("black"), 1))
+            painter.setPen(QPen(QColor("black"), border_thickness))
             painter.drawRect(pallet)
 
-    def paintEvent(self, _):
-        """
-        Instantiates a QPainter object, recalculates the pixel dimensions of the pallets and the border rectangle
-        based on the size of the window, and redraws all pallets.
-        """
-        painter = QPainter(self)
+    def draw_truck(self, painter, width, height, to_print=False):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)
-        self.gutter = self.height() // 200
+        self.resize(width, height)
+        self.gutter = height // 200
+
         self.update_standard_pallet_width()
         self.update_border_rect()
         self.update_pallet_rect_dimensions()
 
         self.pallet_rects = []
         self.brush_offset = 0
-        for _ in range(9):
+        for _ in range(2):
             self.generate_arrangement((145, 145, 145))
+        self.generate_arrangement((120, 120, 120))
+        self.generate_arrangement((120, 120))
+        self.generate_arrangement((17080, 120, 120, 60, 60))
+        self.generate_arrangement((17090, 60))
+        self.generate_arrangement((17090, 145, 145))
+        self.generate_arrangement((130, 120, 120))
 
-        self.draw_border_rect(painter)
-        self.draw_arrangements(painter)
+        border_thickness = 10 if to_print else 1
+        self.draw_border_rect(painter, border_thickness)
+        self.draw_arrangements(painter, border_thickness)
 
+    def paintEvent(self, _):
+        """
+        Instantiates a QPainter object and calls the draw_truck() function, which draws the arrengements inside the
+        widget.
+        """
+        painter = QPainter(self)
+        self.draw_truck(painter, self.width(), self.height())
         painter.end()
+
+
+def export_truck_to_pdf(filename: str):
+    printer = QPrinter(QPrinter.PrinterMode.HighResolution)
+    printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
+    printer.setOutputFileName(filename)
+
+    printer.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
+
+    painter = QPainter(printer)
+
+    view = TruckView()
+
+    page_rect = printer.pageRect(QPrinter.Unit.DevicePixel)
+    width = int(page_rect.width() * 0.4)
+    height = int(page_rect.height() * 0.4)
+
+    view.draw_truck(painter, width, height, to_print=True)
+
+    painter.end()
 
 
 class MainWindow(QMainWindow):
@@ -136,6 +168,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("PyQt Vector drawing test")
         self.setCentralWidget(TruckView())
         self.resize(200, 600)
+        export_truck_to_pdf("test.pdf")
 
 
 if __name__ == "__main__":
