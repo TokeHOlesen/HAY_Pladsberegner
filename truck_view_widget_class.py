@@ -1,7 +1,7 @@
 import sys
 import arrangement_rect_generator as arr_rect_gen
 from PyQt6.QtCore import QRect
-from PyQt6.QtGui import QPainter, QPen, QColor, QPageSize
+from PyQt6.QtGui import QPainter, QPen, QColor, QPageSize, QFont
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow
 from PyQt6.QtPrintSupport import QPrinter
 
@@ -109,6 +109,11 @@ class TruckView(QWidget):
             painter.drawRect(pallet)
 
     def draw_truck(self, painter, width, height, to_print=False):
+        """
+        Updates pixel sizes, generates PalletRect objects (to self.pallet_rects[]) and draws them using a QPainter
+        object. Can be used to draw both to screen and to a printer.
+        If the to_print parameter is True, the border will be drawn thicker, to appear properly on the printed page.
+        """
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)
         self.resize(width, height)
         self.gutter = height // 200
@@ -119,8 +124,10 @@ class TruckView(QWidget):
 
         self.pallet_rects = []
         self.brush_offset = 0
+        self.generate_arrangement((23090, ))
         for _ in range(2):
             self.generate_arrangement((145, 145, 145))
+        self.generate_arrangement((120, 120, 120))
         self.generate_arrangement((120, 120, 120))
         self.generate_arrangement((120, 120))
         self.generate_arrangement((17080, 120, 120, 60, 60))
@@ -154,10 +161,40 @@ def export_truck_to_pdf(filename: str):
     view = TruckView()
 
     page_rect = printer.pageRect(QPrinter.Unit.DevicePixel)
-    width = int(page_rect.width() * 0.4)
-    height = int(page_rect.height() * 0.4)
+    truck_width = int(page_rect.width() * 0.4)
+    truck_height = int(page_rect.height() * 0.4)
 
-    view.draw_truck(painter, width, height, to_print=True)
+    margin_left = 800
+    margin_top = 1200
+    space_between_trucks = 500
+
+    painter.save()
+    painter.setFont(QFont("Calibri", 24))
+    painter.drawText(margin_left, margin_top - 300, "Læsseplan - KID0039876")
+    painter.translate(margin_left, margin_top)
+    painter.setFont(QFont("Calibri", 16))
+    painter.setPen(QPen(QColor("black"), 10))
+    painter.drawLine(0, 0, int(page_rect.width() - margin_left * 2), 0)
+    painter.translate(0, 200)
+    painter.drawText(margin_left * 2, 200, "Bil 1:")
+    painter.setFont(QFont("Calibri", 12))
+    start = 680
+    distance = 300
+    painter.drawText(margin_left * 2, start + distance * 0, "170x90, 145x80, 145x80")
+    painter.drawText(margin_left * 2, start + distance * 1, "170x90, 170x90, 130x115, 130x115, 130x115")
+    painter.drawText(margin_left * 2, start + distance * 2, "170x80, 170x80, 170x80")
+    painter.drawText(margin_left * 2, start + distance * 3, "170x80, 120x80, 120x80, 60x80, 60x80")
+    painter.drawText(margin_left * 2, start + distance * 4, "120x80, 120x80, 60x80, 60x80")
+    view.draw_truck(painter, truck_width, truck_height, to_print=True)
+    painter.restore()
+
+    painter.save()
+    painter.translate(margin_left, margin_top + truck_height + space_between_trucks)
+    painter.setPen(QPen(QColor("black"), 10))
+    painter.drawLine(0, 0, int(page_rect.width() - margin_left * 2), 0)
+    painter.translate(0, 200)
+    view.draw_truck(painter, truck_width, truck_height, to_print=True)
+    painter.restore()
 
     painter.end()
 
