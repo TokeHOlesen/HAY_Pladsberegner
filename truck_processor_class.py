@@ -18,9 +18,9 @@ class TruckProcessor:
         # How many load meters may at most be loaded on this truck, * 100
         self.max_ldm: int = max_ldm
 
-    def load_grouping(self, grouping: Grouping):
+    def load_grouping(self, grouping: Grouping) -> None:
         """Loads a grouping to be processed and resets the results of any previous calculations."""
-        self.trucks = []
+        self.trucks: list[Truck] = []
         self.arrangements = grouping.arrangements
         self.loose_pallets = grouping.loose_pallets
 

@@ -7,14 +7,16 @@ MARGIN_LEFT = 800
 MARGIN_TOP = 1200
 SPACE_BETWEEN_TRUCKS = 500
 
-FONT_MAIN_HEADER = QFont("Arial", 24)
-FONT_TRUCK_HEADER = QFont("Arial", 16)
-FONT_TRUCK_CONTENTS = QFont("Arial", 12)
-FONT_PALLET_COUNT = QFont("Arial", 10)
+FONT = "Arial"
+
+FONT_MAIN_HEADER = QFont(FONT, 24)
+FONT_TRUCK_HEADER = QFont(FONT, 16)
+FONT_TRUCK_CONTENTS = QFont(FONT, 12)
+FONT_PALLET_COUNT = QFont(FONT, 10)
 
 DESCRIPTION_ORIGIN = 680
-SECTION_GAP = 400
 DESCRIPTION_LINE_SPACING = 300
+SECTION_GAP = 400
 PALLET_COUNT_LINE_SPACING = 200
 
 
@@ -30,6 +32,7 @@ def draw_truck_contents(truck, painter, page_rect, truck_number):
     truck_height = int(page_rect.height() * 0.4)
     truck_view = TruckView()
     truck_view.load_truck(truck)
+    pallet_count_font_height = QFontMetrics(FONT_PALLET_COUNT).height()
 
     painter.save()
     painter.translate(MARGIN_LEFT, MARGIN_TOP)
@@ -38,8 +41,6 @@ def draw_truck_contents(truck, painter, page_rect, truck_number):
     painter.drawLine(0, 0, int(page_rect.width() - MARGIN_LEFT * 2), 0)
     painter.translate(0, 200)
     painter.drawText(MARGIN_LEFT * 2, 200, f"Bil {truck_number}:")
-
-    pallet_count_font_height = QFontMetrics(FONT_PALLET_COUNT).height()
 
     painter.setFont(FONT_TRUCK_CONTENTS)
 
