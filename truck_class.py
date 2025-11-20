@@ -1,6 +1,6 @@
 from collections import Counter
 from arrangement_collection_abstract_class import ArrangementCollection
-from constants import ARRANGEMENT_ORDER, ARRANGEMENT_FORMATTED_OUTPUT, ARRANGEMENT_LDM_VALUES
+from constants import ARRANGEMENT_ORDER, ARRANGEMENT_FORMATTED_OUTPUT, ARRANGEMENT_LDM_VALUES, PALLET_FORMATTED_OUTPUT
 
 
 class Truck(ArrangementCollection):
@@ -33,14 +33,28 @@ class Truck(ArrangementCollection):
         description_lines: list[str] = []
         arrangement_count = Counter(self.arrangements)
 
-        for arrangement in ARRANGEMENT_FORMATTED_OUTPUT:
-            if arrangement in arrangement_count:
-                count: int = arrangement_count[arrangement]
-                description: str = ARRANGEMENT_FORMATTED_OUTPUT[arrangement]
-                arrangement_ldm: float = round(ARRANGEMENT_LDM_VALUES[arrangement] / 100, 2)
-                description_lines.append(f"{count} x {description} ({arrangement_ldm} ldm x {count})")
+        for arrangement in arrangement_count:
+            count: int = arrangement_count[arrangement]
+            description: str = ARRANGEMENT_FORMATTED_OUTPUT[arrangement]
+            arrangement_ldm: float = round(ARRANGEMENT_LDM_VALUES[arrangement] / 100, 2)
+            description_lines.append(f"{count} x {description} ({arrangement_ldm} ldm x {count})")
 
         return description_lines
+
+    @property
+    def pallet_count_lines(self) -> list[str]:
+        """Returns a list of strings, representing the amount of each pallet type on this truck."""
+        all_pallets: list[int] = []
+        pallet_count_lines: list[str] = []
+        for arrangement in self.arrangements:
+            for pallet in arrangement:
+                all_pallets.append(pallet)
+        pallet_count = Counter(all_pallets)
+        for pallet in PALLET_FORMATTED_OUTPUT:
+            if pallet in pallet_count:
+                pallet_count_lines.append(f"{PALLET_FORMATTED_OUTPUT[pallet]}: {pallet_count[pallet]} stk.")
+
+        return pallet_count_lines
 
     def form_120_arrangements(self) -> None:
         """Forms (120, 120, 120) and (120, 120) arrangements from the loose 120 pallet pool."""
