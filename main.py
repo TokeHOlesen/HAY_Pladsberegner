@@ -1,4 +1,5 @@
 import sys
+import constants
 from load_calculator_class import LoadCalculator
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from truck_view_widget_class import TruckView
@@ -8,7 +9,7 @@ from pdf_generator import generate_pdf
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HAY Pladsberegner")
+        self.setWindowTitle(f"HAY Pladsberegner {constants.VERSION}")
 
         load_calculator = LoadCalculator()
         load_calculator.load_pallets(*[0, 1, 1, 1, 1, 1, 0])

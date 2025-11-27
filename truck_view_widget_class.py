@@ -175,7 +175,7 @@ class TruckView(QWidget):
             self.draw_pallet_rects(painter, border_thickness)
         else:
             painter.save()
-            painter.setFont(QFont("Arial", self.border_rect.height() // 40))
+            painter.setFont(QFont("Arial", self.border_rect.height() // (40 * border_thickness)))
             painter.drawText(self.border_rect, Qt.AlignmentFlag.AlignCenter, "Rester")
             painter.restore()
 
@@ -192,7 +192,9 @@ class TruckView(QWidget):
         self.update_border_rect()
         self.update_pallet_rect_dimensions()
 
-        font = QFont("Arial", self.border_rect.height() // 48)
+        border_thickness = 10 if to_print else 1
+
+        font = QFont("Arial", self.border_rect.height() // (48 * border_thickness))
         font_height = QFontMetrics(font).height()
 
         self.pallet_rects = []
@@ -211,7 +213,6 @@ class TruckView(QWidget):
                                        font_height,
                                        leftover_count[pallet_type])
 
-        border_thickness = 10 if to_print else 1
         self.draw_border_rect(painter, border_thickness)
         self.draw_pallet_rects(painter, border_thickness)
         self.draw_text(painter, font)
