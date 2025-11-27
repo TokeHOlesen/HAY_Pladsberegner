@@ -5,7 +5,7 @@ from PyQt6.QtCore import QRect
 from PyQt6.QtGui import QPainter, QPen, QColor
 from PyQt6.QtWidgets import QWidget
 
-
+# Relative dimensions of the truck; 13.6 x 2.4m is the standard trailer size
 RELATIVE_HEIGHT = 13.6
 RELATIVE_WIDTH = 2.4
 
@@ -16,12 +16,18 @@ class TruckView(QWidget):
         super().__init__()
         self.setMinimumSize(150, 400)
         self.aspect = RELATIVE_HEIGHT / RELATIVE_WIDTH
+        # By how much to offset the drawing of the next arrangement
         self.brush_offset = 0
+        # Empty space around pallets
         self.gutter = 0
+        # Holds PalletRect objects, each one representing a pallet
         self.pallet_rects = []
+        # How many pixels to represent the width of a standard pallet (80 cm)
         self.standard_pallet_width = 0
         self.border_rect = None
+        # Holds pixel values for every pallet type; populated by calling update_pallet_rect_dimensions()
         self.pallet_rect_dimensions = {}
+        # A Truck object providing the data to be drawn
         self.truck: Truck = Truck(DEFAULT_MAX_TRUCK_LDM)
 
     def load_truck(self, truck):

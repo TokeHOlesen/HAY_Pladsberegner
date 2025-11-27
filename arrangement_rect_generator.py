@@ -269,6 +269,7 @@ def gen_23090(x, y, _, gutter, dimensions) -> tuple[list[PalletRect], int]:
     return pallet_rects, brush_offset
 
 
+# The key corresponds to the arrangement tuple to be drawn; the value is the corresponding drawing function
 generate = {
     (60, 60, 60): gen_60_60_60,
     (120, 120, 120): gen_120_120_120,

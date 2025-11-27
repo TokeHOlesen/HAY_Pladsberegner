@@ -5,63 +5,78 @@ from math import ceil
 
 MARGIN_LEFT = 800
 MARGIN_TOP = 1200
+# Empty space between the two truck views on the page
 SPACE_BETWEEN_TRUCKS = 500
 
 FONT = "Arial"
-
 FONT_MAIN_HEADER = QFont(FONT, 24)
 FONT_TRUCK_HEADER = QFont(FONT, 16)
 FONT_TRUCK_CONTENTS = QFont(FONT, 12)
 FONT_PALLET_COUNT = QFont(FONT, 10)
 
+# Relative starting position for drawing the truck contents description (details about arrangements on truck)
 DESCRIPTION_ORIGIN = 680
+# Line spacing for the contents description
 DESCRIPTION_LINE_SPACING = 300
+# Size of the gap between different text sections
 SECTION_GAP = 400
+# Line spacing for the pallet count section
 PALLET_COUNT_LINE_SPACING = 200
 
 
-def draw_main_header(painter, reference_name, page_number, total_pages):
+def draw_main_header(painter, reference_name, page_number, total_pages) -> None:
+    """Draws the main header with reference number and page numbering."""
     painter.save()
     painter.setFont(FONT_MAIN_HEADER)
     painter.drawText(MARGIN_LEFT, MARGIN_TOP - 300, f"Læsseplan: {reference_name} ({page_number}/{total_pages})")
     painter.restore()
 
 
-def draw_truck_contents(truck, painter, page_rect, truck_number):
-    truck_width = int(page_rect.width() * 0.4)
-    truck_height = int(page_rect.height() * 0.4)
-    truck_view = TruckView()
+def draw_truck_contents(truck, painter, page_rect, truck_number) -> None:
+    """Draws the TruckView for a given truck and the text describing the contents."""
+    truck_width: int = int(page_rect.width() * 0.4)
+    truck_height: int = int(page_rect.height() * 0.4)
+    truck_view: TruckView = TruckView()
     truck_view.load_truck(truck)
-    pallet_count_font_height = QFontMetrics(FONT_PALLET_COUNT).height()
+    pallet_count_font_height: int = QFontMetrics(FONT_PALLET_COUNT).height()
 
     painter.save()
+
+    # Draws a horizontal spacer line
     painter.translate(MARGIN_LEFT, MARGIN_TOP)
-    painter.setFont(FONT_TRUCK_HEADER)
     painter.setPen(QPen(QColor("black"), 10))
     painter.drawLine(0, 0, int(page_rect.width() - MARGIN_LEFT * 2), 0)
+
+    # Draws the header text
     painter.translate(0, 200)
+    painter.setFont(FONT_TRUCK_HEADER)
     painter.drawText(MARGIN_LEFT * 2, 200, f"Bil {truck_number}:")
 
+    # Draws the truck contents description
     painter.setFont(FONT_TRUCK_CONTENTS)
-
     for i, description_line in enumerate(truck.description_lines):
         painter.drawText(MARGIN_LEFT * 2, DESCRIPTION_ORIGIN + DESCRIPTION_LINE_SPACING * i, description_line)
 
-    pallet_count_origin = truck_height - (len(truck.pallet_count_lines) * pallet_count_font_height + (len(truck.pallet_count_lines) * PALLET_COUNT_LINE_SPACING) + SECTION_GAP)
-    total_info_origin = pallet_count_origin + len(truck.pallet_count_lines) + SECTION_GAP
-
+    # Draws the pallet count
+    pallet_count_origin: int = truck_height - (len(truck.pallet_count_lines) * pallet_count_font_height + (len(truck.pallet_count_lines) * PALLET_COUNT_LINE_SPACING) + SECTION_GAP)
+    total_info_origin: int = pallet_count_origin + len(truck.pallet_count_lines) + SECTION_GAP
     painter.setFont(FONT_PALLET_COUNT)
     for i, pallet_count_line in enumerate(truck.pallet_count_lines):
         painter.drawText(MARGIN_LEFT * 2, pallet_count_origin + PALLET_COUNT_LINE_SPACING * i, pallet_count_line)
         total_info_origin += PALLET_COUNT_LINE_SPACING
 
+    # Draws the text containing information about total number of pallets and ldm.
     painter.drawText(MARGIN_LEFT * 2, total_info_origin, f"{truck.number_of_pallets} paller i alt, {round((truck.total_ldm / 100), 2)} ldm.")
 
+    # Draws the truck content rects
     truck_view.draw_truck(painter, truck_width, truck_height, to_print=True)
+
     painter.restore()
 
 
 def generate_pdf(trucks, loose_pallets, reference_name, filename: str):
+    """Generates a pdf file based on the passed data."""
+    # Printer setup
     printer = QPrinter(QPrinter.PrinterMode.HighResolution)
     printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
     printer.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
@@ -71,8 +86,12 @@ def generate_pdf(trucks, loose_pallets, reference_name, filename: str):
     painter.begin(printer)
 
     painter.save()
-    total_pages = ceil((len(trucks) + int(len(trucks) % 2 == 0 and loose_pallets != [])) / 2)
-    page_number = 0
+
+    total_pages: int = ceil((len(trucks) + int(len(trucks) % 2 == 0 and loose_pallets != [])) / 2)
+    page_number: int = 0
+
+    # Since there are two trucks per page, adds a new page every other truck.
+    # Prints a header on top of every new page.
     for i, truck in enumerate(trucks):
         if i % 2 == 0:
             page_number += 1
@@ -84,6 +103,6 @@ def generate_pdf(trucks, loose_pallets, reference_name, filename: str):
         else:
             painter.translate(0, int(page_rect.height() * 0.4) + SPACE_BETWEEN_TRUCKS)
             draw_truck_contents(trucks[i], painter, page_rect, i + 1)
-    painter.restore()
 
+    painter.restore()
     painter.end()
