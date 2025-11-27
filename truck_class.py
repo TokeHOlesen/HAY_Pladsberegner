@@ -31,7 +31,7 @@ class Truck(ArrangementCollection):
     def description_lines(self) -> list[str]:
         """Returns a list of strings, representing the contents of this truck."""
         description_lines: list[str] = []
-        arrangement_count = Counter(self.arrangements)
+        arrangement_count: Counter = Counter(self.arrangements)
 
         for arrangement in arrangement_count:
             count: int = arrangement_count[arrangement]

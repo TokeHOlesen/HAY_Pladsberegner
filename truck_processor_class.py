@@ -49,6 +49,11 @@ class TruckProcessor:
         return sum(PALLET_LDM_VALUES[pallet] for pallet in self.loose_pallets)
 
     @property
+    def number_of_arrangements(self) -> int:
+        """Returns the number of arrangements on this truck."""
+        return len(self.arrangements)
+
+    @property
     def last_truck(self) -> Truck:
         """Returns the last truck in self.trucks."""
         return self.trucks[-1]
@@ -97,6 +102,10 @@ class TruckProcessor:
 
     def add_trucks_for_loose_pallets(self) -> None:
         """If the remaining loose pallets can't fit on the last truck, adds a new truck(s)."""
+        # If no arrangements can be formed, adds an empty truck
+        if self.number_of_arrangements == 0 and self.number_of_loose_pallets != 0:
+            self.add_truck()
+        # If there's too many loose pallets to fit on the last truck, adds empty truck(s)
         loose_ldm_remaining: int = self.ldm_of_loose_pallets
         while loose_ldm_remaining > 0:
             # If there is no ldm left on the last truck, always adds a new one
