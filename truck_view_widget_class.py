@@ -3,7 +3,7 @@ from pallet_rect_class import PalletRect
 from constants import DEFAULT_MAX_TRUCK_LDM, PALLET_COLORS
 from truck_class import Truck
 from collections import Counter
-from PyQt6.QtCore import QRect
+from PyQt6.QtCore import QRect, Qt
 from PyQt6.QtGui import QPainter, QPen, QColor, QFont, QFontMetrics
 from PyQt6.QtWidgets import QWidget
 
@@ -41,8 +41,8 @@ class TruckView(QWidget):
     def load_truck(self, truck: Truck) -> None:
         self.truck = truck
 
-    def load_loose_pallets(self, leftovers: list[int]) -> None:
-        self.loose_pallets = leftovers
+    def load_loose_pallets(self, loose_pallets: list[int]) -> None:
+        self.loose_pallets = loose_pallets
 
     def update_standard_pallet_width(self) -> None:
         """
@@ -170,7 +170,14 @@ class TruckView(QWidget):
 
         border_thickness: int = 10 if to_print else 1
         self.draw_border_rect(painter, border_thickness)
-        self.draw_pallet_rects(painter, border_thickness)
+        # If the truck is not empty, draws the rects representing pallets; otherwise, draws "Rester" in the middle
+        if len(self.truck.arrangements) > 0:
+            self.draw_pallet_rects(painter, border_thickness)
+        else:
+            painter.save()
+            painter.setFont(QFont("Arial", self.border_rect.height() // 40))
+            painter.drawText(self.border_rect, Qt.AlignmentFlag.AlignCenter, "Rester")
+            painter.restore()
 
     def draw_text(self, painter, font) -> None:
         painter.setFont(font)
@@ -215,5 +222,6 @@ class TruckView(QWidget):
         widget.
         """
         painter = QPainter(self)
-        self.draw_loose_pallets(painter, self.width(), self.height())
+        self.draw_truck(painter, self.width(), self.height())
+        # self.draw_loose_pallets(painter, self.width(), self.height())
         painter.end()
