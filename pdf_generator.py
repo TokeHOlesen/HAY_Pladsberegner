@@ -2,6 +2,8 @@ from PyQt6.QtPrintSupport import QPrinter
 from PyQt6.QtGui import QPainter, QPen, QColor, QPageSize, QFont, QFontMetrics
 from truck_view_widget_class import TruckView
 from math import ceil
+from collections import Counter
+from constants import PALLET_FORMATTED_OUTPUT
 
 MARGIN_LEFT = 800
 MARGIN_TOP = 1200
@@ -74,7 +76,38 @@ def draw_truck_contents(truck, painter, page_rect, truck_number) -> None:
     painter.restore()
 
 
-def generate_pdf(trucks, loose_pallets, reference_name, filename: str):
+def draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect):
+    truck_width: int = int(page_rect.width() * 0.4)
+    truck_height: int = int(page_rect.height() * 0.4)
+    truck_view: TruckView = TruckView()
+    truck_view.load_loose_pallets(loose_pallets)
+    pallet_count_font_height: int = QFontMetrics(FONT_PALLET_COUNT).height()
+
+    painter.save()
+
+    # Draws a horizontal spacer line
+    painter.translate(MARGIN_LEFT, MARGIN_TOP)
+    painter.setPen(QPen(QColor("black"), 10))
+    painter.drawLine(0, 0, int(page_rect.width() - MARGIN_LEFT * 2), 0)
+
+    painter.translate(0, 200)
+    painter.setFont(FONT_TRUCK_HEADER)
+    painter.drawText(MARGIN_LEFT * 2, 200, "Rester:")
+
+    leftover_count: Counter = Counter(loose_pallets)
+
+    painter.setFont(FONT_TRUCK_CONTENTS)
+    for i, pallet_type in enumerate(leftover_count):
+        painter.drawText(MARGIN_LEFT * 2, DESCRIPTION_ORIGIN + DESCRIPTION_LINE_SPACING * i, f"{PALLET_FORMATTED_OUTPUT[pallet_type]} x {leftover_count[pallet_type]}")
+
+    truck_view.draw_loose_pallets(painter, truck_width, truck_height, to_print=True)
+
+    painter.drawText(MARGIN_LEFT * 2, truck_height - pallet_count_font_height, f"{len(loose_pallets)} restpaller i alt, ca. {round(loose_pallets_ldm / 100, 2)} ldm.")
+
+    painter.restore()
+
+
+def generate_pdf(trucks, loose_pallets, loose_pallets_ldm, reference_name, filename: str):
     """Generates a pdf file based on the passed data."""
     # Printer setup
     printer = QPrinter(QPrinter.PrinterMode.HighResolution)
@@ -87,22 +120,29 @@ def generate_pdf(trucks, loose_pallets, reference_name, filename: str):
 
     painter.save()
 
-    total_pages: int = ceil((len(trucks) + int(len(trucks) % 2 == 0 and loose_pallets != [])) / 2)
+    total_entries: int = len(trucks) + int(loose_pallets != [])
+    total_pages: int = ceil(total_entries / 2)
     page_number: int = 0
 
     # Since there are two trucks per page, adds a new page every other truck.
     # Prints a header on top of every new page.
-    for i, truck in enumerate(trucks):
+    for i in range(total_entries):
         if i % 2 == 0:
             page_number += 1
             if page_number > 1:
                 printer.newPage()
                 painter.resetTransform()
             draw_main_header(painter, reference_name, page_number, total_pages)
-            draw_truck_contents(trucks[i], painter, page_rect, i + 1)
+            if i == total_entries - 1 and loose_pallets != []:
+                draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect)
+            else:
+                draw_truck_contents(trucks[i], painter, page_rect, i + 1)
         else:
             painter.translate(0, int(page_rect.height() * 0.4) + SPACE_BETWEEN_TRUCKS)
-            draw_truck_contents(trucks[i], painter, page_rect, i + 1)
+            if i == total_entries - 1 and loose_pallets != []:
+                draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect)
+            else:
+                draw_truck_contents(trucks[i], painter, page_rect, i + 1)
 
     painter.restore()
     painter.end()
