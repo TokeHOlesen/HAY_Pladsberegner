@@ -201,7 +201,7 @@ class TruckView(QWidget):
         self.text_to_draw = []
         self.brush_offset = self.border_rect.height() // 30
         left_margin: int = self.border_rect.width() // 8
-        text_margin: int = self.border_rect.width() - self.border_rect.width() // 4
+        text_margin: int = self.border_rect.width() - int(self.border_rect.width() / 3.5)
         spacing = self.border_rect.height() // 20
         leftover_count: Counter = Counter(self.loose_pallets)
 

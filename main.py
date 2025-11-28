@@ -12,7 +12,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"HAY Pladsberegner {constants.VERSION}")
 
         load_calculator = LoadCalculator()
-        load_calculator.load_pallets(*[0, 34, 1, 0, 0, 0, 0])
+        load_calculator.load_pallets(*[0, 1, 6, 3, 3, 1, 0])
+        # TODO: make LoadCalculator return an object
         load_calculator.calculate_load()
         trucks = load_calculator.trucks
         loose_pallets = load_calculator.loose_pallets

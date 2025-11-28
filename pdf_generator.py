@@ -26,11 +26,14 @@ SECTION_GAP = 400
 PALLET_COUNT_LINE_SPACING = 200
 
 
-def draw_main_header(painter, reference_name, page_number, total_pages) -> None:
+def draw_main_header(painter, reference_name, page_rect, page_number, total_pages) -> None:
     """Draws the main header with reference number and page numbering."""
     painter.save()
     painter.setFont(FONT_MAIN_HEADER)
-    painter.drawText(MARGIN_LEFT, MARGIN_TOP - 300, f"Læsseplan: {reference_name} ({page_number}/{total_pages})")
+    painter.drawText(MARGIN_LEFT, MARGIN_TOP - 300, f"Læsseplan: {reference_name}")
+    page_numbering_text: str = f"{page_number}/{total_pages}"
+    page_numbering_width = painter.fontMetrics().horizontalAdvance(page_numbering_text)
+    painter.drawText(int(page_rect.width()) - MARGIN_LEFT - page_numbering_width, MARGIN_TOP - 300, page_numbering_text)
     painter.restore()
 
 
@@ -98,10 +101,11 @@ def draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect):
 
     painter.setFont(FONT_TRUCK_CONTENTS)
     for i, pallet_type in enumerate(leftover_count):
-        painter.drawText(MARGIN_LEFT * 2, DESCRIPTION_ORIGIN + DESCRIPTION_LINE_SPACING * i, f"{PALLET_FORMATTED_OUTPUT[pallet_type]} x {leftover_count[pallet_type]}")
+        painter.drawText(MARGIN_LEFT * 2, DESCRIPTION_ORIGIN + DESCRIPTION_LINE_SPACING * i, f"{leftover_count[pallet_type]} x {PALLET_FORMATTED_OUTPUT[pallet_type]}")
 
     truck_view.draw_loose_pallets(painter, truck_width, truck_height, to_print=True)
 
+    painter.setFont(FONT_PALLET_COUNT)
     painter.drawText(MARGIN_LEFT * 2, truck_height - pallet_count_font_height, f"{len(loose_pallets)} restpaller i alt, ca. {round(loose_pallets_ldm / 100, 2)} ldm.")
 
     painter.restore()
@@ -132,7 +136,7 @@ def generate_pdf(trucks, loose_pallets, loose_pallets_ldm, reference_name, filen
             if page_number > 1:
                 printer.newPage()
                 painter.resetTransform()
-            draw_main_header(painter, reference_name, page_number, total_pages)
+            draw_main_header(painter, reference_name, page_rect, page_number, total_pages)
             if i == total_entries - 1 and loose_pallets != []:
                 draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect)
             else:
