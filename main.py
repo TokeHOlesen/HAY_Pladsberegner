@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"HAY Pladsberegner {constants.VERSION}")
 
         load_calculator = LoadCalculator()
-        load_calculator.load_pallets(*[0, 1, 6, 3, 3, 1, 0])
+        load_calculator.load_pallets(*[0, 62, 33, 54, 0, 0, 30])
         # TODO: make LoadCalculator return an object
         load_calculator.calculate_load()
         trucks = load_calculator.trucks
@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
         truck_view_widget = TruckView()
         truck_view_widget.load_truck(trucks[0])
         truck_view_widget.load_loose_pallets(loose_pallets)
-        generate_pdf(trucks, loose_pallets, loose_pallets_ldm, "KID0029876", "test_pdf.pdf")
+        generate_pdf(trucks, loose_pallets, loose_pallets_ldm, "KID0012345", "test_pdf.pdf")
         self.setCentralWidget(truck_view_widget)
         self.resize(200, 600)
 

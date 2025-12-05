@@ -10,7 +10,7 @@ MARGIN_TOP = 1200
 # Empty space between the two truck views on the page
 SPACE_BETWEEN_TRUCKS = 500
 
-FONT = "Arial"
+FONT = "Calibri"
 FONT_MAIN_HEADER = QFont(FONT, 24)
 FONT_TRUCK_HEADER = QFont(FONT, 16)
 FONT_TRUCK_CONTENTS = QFont(FONT, 12)
