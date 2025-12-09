@@ -37,12 +37,14 @@ def draw_main_header(painter, reference_name, page_rect, page_number, total_page
     painter.restore()
 
 
-def draw_truck_contents(truck, painter, page_rect, truck_number) -> None:
+def draw_truck_contents(truck, loose_pallets, painter, page_rect, truck_number) -> None:
     """Draws the TruckView for a given truck and the text describing the contents."""
     truck_width: int = int(page_rect.width() * 0.4)
     truck_height: int = int(page_rect.height() * 0.4)
     truck_view: TruckView = TruckView()
     truck_view.load_truck(truck)
+    truck_view.load_loose_pallets(loose_pallets)
+
     pallet_count_font_height: int = QFontMetrics(FONT_PALLET_COUNT).height()
 
     painter.save()
@@ -140,13 +142,13 @@ def generate_pdf(trucks, loose_pallets, loose_pallets_ldm, reference_name, filen
             if i == total_entries - 1 and loose_pallets != []:
                 draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect)
             else:
-                draw_truck_contents(trucks[i], painter, page_rect, i + 1)
+                draw_truck_contents(trucks[i], loose_pallets, painter, page_rect, i + 1)
         else:
             painter.translate(0, int(page_rect.height() * 0.4) + SPACE_BETWEEN_TRUCKS)
             if i == total_entries - 1 and loose_pallets != []:
                 draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect)
             else:
-                draw_truck_contents(trucks[i], painter, page_rect, i + 1)
+                draw_truck_contents(trucks[i], loose_pallets, painter, page_rect, i + 1)
 
     painter.restore()
     painter.end()

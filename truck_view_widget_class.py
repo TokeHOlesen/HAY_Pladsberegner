@@ -175,8 +175,9 @@ class TruckView(QWidget):
             self.draw_pallet_rects(painter, border_thickness)
         else:
             painter.save()
-            painter.setFont(QFont("Arial", self.border_rect.height() // (40 * border_thickness)))
-            painter.drawText(self.border_rect, Qt.AlignmentFlag.AlignCenter, "Rester")
+            painter.setFont(QFont("Calibri", self.border_rect.height() // (40 * border_thickness)))
+            text: str = "Rester" if len(self.loose_pallets) > 0 else "N/A"
+            painter.drawText(self.border_rect, Qt.AlignmentFlag.AlignCenter, text)
             painter.restore()
 
     def draw_text(self, painter, font) -> None:
@@ -194,7 +195,7 @@ class TruckView(QWidget):
 
         border_thickness = 10 if to_print else 1
 
-        font = QFont("Arial", self.border_rect.height() // (48 * border_thickness))
+        font = QFont("Calibri", self.border_rect.height() // (48 * border_thickness))
         font_height = QFontMetrics(font).height()
 
         self.pallet_rects = []
@@ -223,6 +224,8 @@ class TruckView(QWidget):
         widget.
         """
         painter = QPainter(self)
-        self.draw_truck(painter, self.width(), self.height())
-        # self.draw_loose_pallets(painter, self.width(), self.height())
+        if not self.loose_pallets:
+            self.draw_truck(painter, self.width(), self.height())
+        else:
+            self.draw_loose_pallets(painter, self.width(), self.height())
         painter.end()

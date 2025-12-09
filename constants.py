@@ -1,4 +1,4 @@
-VERSION = "2.0 Alpha"
+VERSION = "2.0 alpha"
 
 # Largest load allowed on a truck (ldm * 100)
 # 1360 is risky, 1330 is optimal, anything below is safe but potentially wasteful
