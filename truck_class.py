@@ -13,7 +13,7 @@ class Truck(ArrangementCollection):
     def number_of_pallets(self) -> int:
         pallet_sum: int = 0
         for arrangement in self.arrangements:
-            for pallet in arrangement:
+            for _ in arrangement:
                 pallet_sum += 1
         return pallet_sum
 

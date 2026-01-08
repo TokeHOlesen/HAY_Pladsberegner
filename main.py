@@ -1,6 +1,6 @@
 import sys
 import constants
-from load_calculator_class import LoadCalculator
+from load_calculator import calculate_load
 from PyQt6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QWidget, QLineEdit, QLabel, QGridLayout
 from PyQt6.QtCore import Qt
 from truck_view_widget_class import TruckView
@@ -13,20 +13,15 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"HAY Pladsberegner {constants.VERSION}")
         self.setFixedSize(400, 668)
 
-        load_calculator = LoadCalculator()
-        load_calculator.load_pallets(*[0, 0, 0, 0, 0, 0, 16])
-        load_calculator.calculate_load()
-        trucks = load_calculator.trucks
-        loose_pallets = load_calculator.loose_pallets
-        loose_pallets_ldm = load_calculator.ldm_of_loose_pallets
+        calc_result = calculate_load([1, 5, 5, 2, 1, 1, 1])
 
         truck_view_widget = TruckView()
         loose_pallets_view_widget = TruckView()
         truck_view_widget.setFixedHeight(self.height() - 10)
         loose_pallets_view_widget.setFixedHeight(self.height() - 10)
-        truck_view_widget.load_truck(trucks[0])
-        if loose_pallets:
-            loose_pallets_view_widget.load_loose_pallets(loose_pallets)
+        truck_view_widget.load_truck(calc_result.trucks[0])
+        if calc_result.loose_pallets:
+            loose_pallets_view_widget.load_loose_pallets(calc_result.loose_pallets)
 
         input_form_widget = QWidget()
         input_form_layout = QGridLayout(input_form_widget)
@@ -62,7 +57,7 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(central_layout)
         self.setCentralWidget(central_widget)
 
-        # generate_pdf(trucks, loose_pallets, loose_pallets_ldm, "KID0012345", "test_pdf.pdf")
+        generate_pdf(calc_result, "KID0012345", "test_pdf.pdf")
 
 
 if __name__ == "__main__":

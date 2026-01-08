@@ -113,7 +113,7 @@ def draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect):
     painter.restore()
 
 
-def generate_pdf(trucks, loose_pallets, loose_pallets_ldm, reference_name, filename: str):
+def generate_pdf(calc_result, reference_name, filename: str):
     """Generates a pdf file based on the passed data."""
     # Printer setup
     printer = QPrinter(QPrinter.PrinterMode.HighResolution)
@@ -126,7 +126,7 @@ def generate_pdf(trucks, loose_pallets, loose_pallets_ldm, reference_name, filen
 
     painter.save()
 
-    total_entries: int = len(trucks) + int(loose_pallets != [])
+    total_entries: int = len(calc_result.trucks) + int(calc_result.loose_pallets != [])
     total_pages: int = ceil(total_entries / 2)
     page_number: int = 0
 
@@ -139,16 +139,16 @@ def generate_pdf(trucks, loose_pallets, loose_pallets_ldm, reference_name, filen
                 printer.newPage()
                 painter.resetTransform()
             draw_main_header(painter, reference_name, page_rect, page_number, total_pages)
-            if i == total_entries - 1 and loose_pallets != []:
-                draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect)
+            if i == total_entries - 1 and calc_result.loose_pallets != []:
+                draw_loose_pallets(calc_result.loose_pallets, calc_result.loose_pallets_ldm, painter, page_rect)
             else:
-                draw_truck_contents(trucks[i], loose_pallets, painter, page_rect, i + 1)
+                draw_truck_contents(calc_result.trucks[i], calc_result.loose_pallets, painter, page_rect, i + 1)
         else:
             painter.translate(0, int(page_rect.height() * 0.4) + SPACE_BETWEEN_TRUCKS)
-            if i == total_entries - 1 and loose_pallets != []:
-                draw_loose_pallets(loose_pallets, loose_pallets_ldm, painter, page_rect)
+            if i == total_entries - 1 and calc_result.loose_pallets != []:
+                draw_loose_pallets(calc_result.loose_pallets, calc_result.loose_pallets_ldm, painter, page_rect)
             else:
-                draw_truck_contents(trucks[i], loose_pallets, painter, page_rect, i + 1)
+                draw_truck_contents(calc_result.trucks[i], calc_result.loose_pallets, painter, page_rect, i + 1)
 
     painter.restore()
     painter.end()
