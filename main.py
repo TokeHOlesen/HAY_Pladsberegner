@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         self.setFixedSize(400, 668)
 
         load_calculator = LoadCalculator()
-        load_calculator.load_pallets(*[1, 4, 4, 3, 2, 2, 0])
+        load_calculator.load_pallets(*[0, 0, 0, 0, 0, 0, 16])
         load_calculator.calculate_load()
         trucks = load_calculator.trucks
         loose_pallets = load_calculator.loose_pallets
