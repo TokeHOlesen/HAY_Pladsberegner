@@ -12,7 +12,7 @@ class LoadCalculationResult:
     number_of_pallets: int
     number_of_trucks: int
     number_of_loose_pallets: int
-    ldm_of_loose_pallets: int
+    loose_pallets_ldm: int
 
 
 def calculate_load(pallets: list[int]) -> LoadCalculationResult:
@@ -32,4 +32,4 @@ def calculate_load(pallets: list[int]) -> LoadCalculationResult:
                                  number_of_pallets=grouping_processor.number_of_pallets,
                                  number_of_trucks=truck_processor.number_of_trucks,
                                  number_of_loose_pallets=truck_processor.number_of_loose_pallets,
-                                 ldm_of_loose_pallets=truck_processor.ldm_of_loose_pallets)
+                                 loose_pallets_ldm=truck_processor.ldm_of_loose_pallets)
