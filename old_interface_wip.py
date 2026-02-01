@@ -63,7 +63,7 @@ def reset_all(mode):
     global max_truck_ldm
     global ldm_of_leftovers
     global entry_focus
-    loose_pallet_count = loose_pallet_count.fromkeys(loose_pallet_count, 0)
+    loose_pallet_count = 0
     trucks = []
     truck_to_draw = 0
     brush_position = 0
@@ -151,6 +151,7 @@ def calculate_pallets():
 
     global truck_to_draw
     global calc_result
+    global brush_position
 
     if trucks or ldm_of_leftovers:
         reset_all("partial")
@@ -178,7 +179,7 @@ def calculate_pallets():
     # Sets max ldm per truck
     set_target_ldm(entry_ldm.get())
 
-    calc_result = calculate_load(*pallet_input)
+    calc_result = calculate_load(pallet_input)
 
     # Data processing begins here
     start_button.config(state=DISABLED)
@@ -191,17 +192,21 @@ def calculate_pallets():
 
     # Text output of truck contents
 
-    for tr_no, truck in calc_result.trucks:
-        text_output.insert("end", f"\n\nBil {tr_no}:")
-        for line in truck.description_lines:
-            text_output.insert("end", line)
-        text_output.insert("end", f"\n{truck.arrangements_ldm / 100} ldm i grupper ({truck.number_of_pallets} paller).")
+    for tr_no, truck in enumerate(calc_result.trucks):
+        text_output.insert("end", f"\n\nBil {tr_no + 1}:\n")
+        if truck.description_lines:
+            for line in truck.description_lines:
+                text_output.insert("end", line)
+                text_output.insert("end", "\n")
+            text_output.insert("end", f"{truck.arrangements_ldm / 100} ldm i grupper ({truck.number_of_pallets} paller).")
+        else:
+            text_output.insert("end", "Rester.")
 
     # Text output of remaining pallets
 
     text_output.insert("end", "\n\nRest:")
     if calc_result.number_of_loose_pallets > 0:
-        for pallet in calc_result.loose_pallets:
+        for pallet in calc_result.loose_pallet_count:
             text_output.insert("end", f"\n{PALLET_FORMATTED_OUTPUT[pallet]}: x {calc_result.loose_pallet_count[pallet]}")
         text_output.insert("end", f"\nI alt rester: {calc_result.loose_pallets_ldm / 100} ldm.")
     else:
@@ -256,13 +261,13 @@ def draw_truck_rectangle(canvas):
 
 # Draws the contents of a given truck on truck_canvas
 def draw_truck(truck_to_be_drawn):
-    for this_arrangement in truck_to_be_drawn.arrangements:
-        draw_arrangement(this_arrangement, truck_canvas)
-    label_truck.config(text=f"Bil {truck_to_be_drawn + 1}")
-
-"""    else:
+    if truck_to_be_drawn.arrangements_ldm > 0:
+        for this_arrangement in truck_to_be_drawn.arrangements:
+            draw_arrangement(this_arrangement, truck_canvas)
+        label_truck.config(text=f"Bil {truck_to_draw + 1}")
+    else:
         truck_canvas.create_text(48, 255, text="Rester", font=("", "13"))
-"""
+
 
 
 # Draws the contents of the next or the previous truck, depending on which button has been pressed
@@ -294,7 +299,7 @@ def draw_another_truck(direction):
 
     if calc_result.trucks[truck_to_draw]:
         label_pallets_ldm.config(
-            text=f"{calc_result.truck[truck_to_draw].number_of_pallets} pll, {round(calc_result.truck[truck_to_draw].arrangements_lmd / 100, 1)} ldm")
+            text=f"{calc_result.trucks[truck_to_draw].number_of_pallets} pll, {round(calc_result.trucks[truck_to_draw].arrangements_ldm / 100, 1)} ldm")
     else:
         label_pallets_ldm.config(text="N/A")
 
@@ -485,11 +490,11 @@ def draw_leftovers(pallet, canvas, mode):
         y = brush_position
 
         def draw_number_of_leftovers(yy, pallet_type):
-            canvas.create_text(70, y + yy, text=f"x{loose_pallet_count[pallet_type]}", font=("", "13"), anchor="w")
+            canvas.create_text(70, y + yy, text=f"x{calc_result.loose_pallet_count[pallet_type]}", font=("", "13"), anchor="w")
 
         def draw_description(yy, text, pallet_type):
             canvas.create_text(115, y + yy, text=text, font=("", "8"), anchor="w")
-            canvas.create_text(115, y + yy + 15, text=f"{loose_pallet_count[pallet_type]} stk", font=("", "8"), anchor="w")
+            canvas.create_text(115, y + yy + 15, text=f"{calc_result.loose_pallet_count[pallet_type]} stk", font=("", "8"), anchor="w")
 
         if pallet == 60:
             y2 = y + 24
@@ -584,29 +589,28 @@ entry_label_text = [
     "130x115:    ",
     "170x80:    ",
     "170x90:    ",
-    "120x104:    ",
-    "120x114:    "
+    "230x90:    "
 ]
 
 entry_labels = []
 
-for k in range(8):
+for k in range(7):
     entry_label = Label(entry_frame, width=10, anchor="e", text=entry_label_text[k])
     entry_labels.append(entry_label)
 
-for k in range(8):
+for k in range(7):
     entry_labels[k].grid(row=k, column=0, pady=2)
 
 entry_boxes = []
 
-for e in range(8):
+for e in range(7):
     entry_box = Entry(entry_frame, width=7, justify=RIGHT)
     entry_boxes.append(entry_box)
     entry_boxes[e].bind("<Return>", lambda event: move_focus("Return"))
     entry_boxes[e].bind("<Up>", lambda event: move_focus("UpArrow"))
     entry_boxes[e].bind("<Down>", lambda event: move_focus("DownArrow"))
 
-for e in range(8):
+for e in range(7):
     entry_boxes[e].grid(row=e, column=1, pady=2)
 
 # Other GUI elements - self-explanatory
