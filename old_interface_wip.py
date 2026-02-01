@@ -15,6 +15,7 @@ from pdf_generator import generate_pdf
 
 max_truck_ldm = DEFAULT_MAX_TRUCK_LDM
 
+calc_result = None
 trucks = []
 truck_to_draw = 0
 brush_position = 0
@@ -148,6 +149,9 @@ def threaded_calculate_pallets(_):  # CHECK - Irrelevant
 def calculate_pallets():
     status_label.config(text="Klar.")
 
+    global truck_to_draw
+    global calc_result
+
     if trucks or ldm_of_leftovers:
         reset_all("partial")
 
@@ -216,7 +220,7 @@ def calculate_pallets():
 
     # Draws truck contents and leftovers; adjusts UI elements
     if calc_result.number_of_trucks > 0:
-        draw_truck(truck_to_draw)
+        draw_truck(calc_result.trucks[truck_to_draw])
 
     if calc_result.number_of_trucks > 1:
         next_button.config(state=NORMAL)
@@ -252,12 +256,13 @@ def draw_truck_rectangle(canvas):
 
 # Draws the contents of a given truck on truck_canvas
 def draw_truck(truck_to_be_drawn):
-    if trucks[truck_to_be_drawn]:
-        for this_arrangement in trucks[truck_to_be_drawn]:
-            draw_arrangement(this_arrangement, truck_canvas)
-    else:
-        truck_canvas.create_text(48, 255, text="Rester", font=("", "13"))
+    for this_arrangement in truck_to_be_drawn.arrangements:
+        draw_arrangement(this_arrangement, truck_canvas)
     label_truck.config(text=f"Bil {truck_to_be_drawn + 1}")
+
+"""    else:
+        truck_canvas.create_text(48, 255, text="Rester", font=("", "13"))
+"""
 
 
 # Draws the contents of the next or the previous truck, depending on which button has been pressed
@@ -270,26 +275,26 @@ def draw_another_truck(direction):
     draw_truck_rectangle(truck_canvas)
 
     if direction == "Next":
-        if len(trucks) - 1 > truck_to_draw:
+        if len(calc_result.trucks) - 1 > truck_to_draw:
             truck_to_draw += 1
-        draw_truck(truck_to_draw)
+        draw_truck(calc_result.trucks[truck_to_draw])
         if truck_to_draw > 0:
             previous_button.config(state=NORMAL)
-        if len(trucks) - 1 == truck_to_draw:
+        if len(calc_result.trucks) - 1 == truck_to_draw:
             next_button.config(state=DISABLED)
 
     elif direction == "Previous":
         if not truck_to_draw == 0:
             truck_to_draw -= 1
-        draw_truck(truck_to_draw)
+        draw_truck(calc_result.trucks[truck_to_draw])
         if truck_to_draw == 0:
             previous_button.config(state=DISABLED)
-        if len(trucks) - 1 > truck_to_draw:
+        if len(calc_result.trucks) - 1 > truck_to_draw:
             next_button.config(state=NORMAL)
 
-    if trucks[truck_to_draw]:
+    if calc_result.trucks[truck_to_draw]:
         label_pallets_ldm.config(
-            text=f"{number_of_pallets_by_truck[truck_to_draw]} pll, {round(ldm_by_truck[truck_to_draw] / 100, 1)} ldm")
+            text=f"{calc_result.truck[truck_to_draw].number_of_pallets} pll, {round(calc_result.truck[truck_to_draw].arrangements_lmd / 100, 1)} ldm")
     else:
         label_pallets_ldm.config(text="N/A")
 
@@ -460,6 +465,13 @@ def draw_arrangement(arrangement, canvas):
         draw_bracket(y, y2)
         draw_description(10, "170x80 x 1")
         draw_description(25, "0,8 ldm")
+        brush_position += 32 - 1
+    elif arrangement == (23090,):
+        y2 = y + 32
+        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=PALLET_COLORS["17080"])
+        draw_bracket(y, y2)
+        draw_description(10, "23090 x 1")
+        draw_description(25, "0,9 ldm")
         brush_position += 32 - 1
 
 
