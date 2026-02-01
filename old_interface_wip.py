@@ -9,6 +9,9 @@ from threading import Thread
 from os import path, startfile, remove
 
 from constants import *
+from load_calculator import calculate_load
+from pdf_generator import generate_pdf
+
 
 max_truck_ldm = DEFAULT_MAX_TRUCK_LDM
 
@@ -151,31 +154,27 @@ def calculate_pallets():
     # COLLECT INPUT START
 
     # Collects number of pallets from entry boxes
-    pallet_input = []
-    show_empty_warning = True
+    pallet_input = [0, 0, 0, 0, 0, 0, 0]
 
     for b in range(len(entry_boxes)):
-        if not entry_boxes[b].get() == "":
+        if entry_boxes[b].get() != "":
             if entry_boxes[b].get().isnumeric() and int(entry_boxes[b].get()) >= 0:
-                pallet_input.append(int(entry_boxes[b].get()))
+                pallet_input[b] = int(entry_boxes[b].get())
             else:
-                pallet_input = []
-                show_empty_warning = False
-                break
+                messagebox.showwarning("Fejl", "Ugyldigt antal.")
+                return
 
     # Displays a warning messagebox if entry boxes are empty or not filled out properly
     # If show_empty_warning is False, shows a message that the data is incorrect instead
-    if not pallet_input:
-        if show_empty_warning:
-            messagebox.showwarning("Mangler input", "Indtast antal paller.")
-        else:
-            messagebox.showwarning("Fejl", "Ugyldigt antal.")
-        reset_all("partial")
+    if pallet_input == [0, 0, 0, 0, 0, 0, 0]:
+        messagebox.showwarning("Mangler input", "Indtast antal paller.")
         return
 
     # SET TARGET LDM START
     # Sets max ldm per truck
     set_target_ldm(entry_ldm.get())
+
+    calc_result = calculate_load(*pallet_input)
 
     # Data processing begins here
     start_button.config(state=DISABLED)
@@ -187,65 +186,56 @@ def calculate_pallets():
 
 
     # Text output of truck contents
-    # REDO, obviously; remnants left for reference
 
-    text_output.insert("end", f"\n\nBil {truck_number}:")
-    if not truck:
-        text_output.insert("end", "\nRester.")
-
-    text_output.insert(
-        "end", f"\n{ARRANGEMENT_FORMATTED_OUTPUT[arrangement]} x {arrangement_count[arrangement]} "
-               f"({ARRANGEMENT_LDM_VALUES[arrangement] / 100} * {arrangement_count[arrangement]} = "
-               f"{this_truck_ldm / 100} ldm)")
-    current_truck_ldm += this_truck_ldm
-
-    text_output.insert("end", f"\n{current_truck_ldm / 100} ldm i grupper ({pallets_on_truck} paller).")
+    for tr_no, truck in calc_result.trucks:
+        text_output.insert("end", f"\n\nBil {tr_no}:")
+        for line in truck.description_lines:
+            text_output.insert("end", line)
+        text_output.insert("end", f"\n{truck.arrangements_ldm / 100} ldm i grupper ({truck.number_of_pallets} paller).")
 
     # Text output of remaining pallets
 
     text_output.insert("end", "\n\nRest:")
-    if leftover_pallets:
-        for pallet in loose_pallet_count:
-            if loose_pallet_count[pallet] != 0:
-                text_output.insert("end", f"\n{PALLET_FORMATTED_OUTPUT[pallet]}: x {loose_pallet_count[pallet]}")
-        text_output.insert("end", f"\nI alt rester: {ldm_of_leftovers / 100} ldm.")
-        pallets_total += len(leftover_pallets)
+    if calc_result.number_of_loose_pallets > 0:
+        for pallet in calc_result.loose_pallets:
+            text_output.insert("end", f"\n{PALLET_FORMATTED_OUTPUT[pallet]}: x {calc_result.loose_pallet_count[pallet]}")
+        text_output.insert("end", f"\nI alt rester: {calc_result.loose_pallets_ldm / 100} ldm.")
     else:
         text_output.insert("end", "\nIngen.")
 
     # Text summary
     text_output.insert(
-        "end", f"\n\nI alt: {ldm_of_groupable_items / 100} ldm i grupper + "
-               f"{ldm_of_leftovers / 100} ldm rest = "
-               f"{(ldm_of_groupable_items + ldm_of_leftovers) / 100} ldm ({pallets_total} {paller}).")
-    text_output.insert("end", f"\nSkal hentes af {number_of_trucks} {biler}.")
+        "end", f"\n\nI alt: {calc_result.arrangements_ldm / 100} ldm i grupper + "
+               f"{calc_result.loose_pallets_ldm / 100} ldm rest = "
+               f"{(calc_result.arrangements_ldm + calc_result.loose_pallets_ldm) / 100} ldm ({calc_result.number_of_pallets + calc_result.number_of_loose_pallets} paller).")
+    text_output.insert("end", f"\nSkal hentes af {calc_result.number_of_trucks} biler.")
 
     text_output.insert("end", "\n\nFærdig.")
     text_output.see("end")
     text_output.config(state=DISABLED)
 
     # Draws truck contents and leftovers; adjusts UI elements
-    if len(trucks) > 0:
+    if calc_result.number_of_trucks > 0:
         draw_truck(truck_to_draw)
 
-    if len(trucks) > 1:
+    if calc_result.number_of_trucks > 1:
         next_button.config(state=NORMAL)
 
     copy_text_button.config(state=NORMAL)
     print_text_button.config(state=NORMAL)
     save_text_button.config(state=NORMAL)
 
-    if leftover_pallets:
+    if calc_result.number_of_loose_pallets > 0:
         brush_position = 20
-        unique_leftover_pallets = [*set(leftover_pallets)]
+        unique_leftover_pallets = [*set(calc_result.loose_pallets)]
         unique_leftover_pallets.sort()
         for pallet in unique_leftover_pallets:
             draw_leftovers(pallet, leftovers_canvas, "normal")
-        label_leftovers_ldm.config(text=f"{len(leftover_pallets)} pll, ~{round(ldm_of_leftovers / 100, 1)} ldm")
+        label_leftovers_ldm.config(text=f"{calc_result.number_of_loose_pallets} pll, ~{round(calc_result.loose_pallets_ldm / 100, 1)} ldm")
     else:
         draw_leftovers("", leftovers_canvas, "none")
 
-    no_of_trucks_label.config(text=f"Biler i alt: {number_of_trucks}")
+    no_of_trucks_label.config(text=f"Biler i alt: {calc_result.number_of_trucks}")
 
     if number_of_pallets_by_truck and ldm_by_truck:
         label_pallets_ldm.config(text=f"{number_of_pallets_by_truck[0]} pll, {round(ldm_by_truck[0] / 100, 1)} ldm")
