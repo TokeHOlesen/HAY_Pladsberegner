@@ -153,8 +153,9 @@ def calculate_pallets():
     global calc_result
     global brush_position
 
-    if trucks or ldm_of_leftovers:
-        reset_all("partial")
+    if calc_result is not None:
+        if calc_result.number_of_trucks > 0 or calc_result.number_of_loose_pallets > 0:
+            reset_all("partial")
 
     # COLLECT INPUT START
 
@@ -188,7 +189,6 @@ def calculate_pallets():
     progress_bar["value"] = 0
 
     status_label.config(text="Færdig.")
-
 
     # Text output of truck contents
 
@@ -246,8 +246,8 @@ def calculate_pallets():
 
     no_of_trucks_label.config(text=f"Biler i alt: {calc_result.number_of_trucks}")
 
-    if number_of_pallets_by_truck and ldm_by_truck:
-        label_pallets_ldm.config(text=f"{number_of_pallets_by_truck[0]} pll, {round(ldm_by_truck[0] / 100, 1)} ldm")
+    if calc_result.number_of_trucks > 0:
+        label_pallets_ldm.config(text=f"{calc_result.trucks[truck_to_draw].number_of_pallets} pll, {round(calc_result.trucks[truck_to_draw].arrangements_ldm / 100, 1)} ldm")
 
     start_button.config(state=NORMAL)
     reset_button.config(state=NORMAL)
@@ -266,8 +266,8 @@ def draw_truck(truck_to_be_drawn):
             draw_arrangement(this_arrangement, truck_canvas)
         label_truck.config(text=f"Bil {truck_to_draw + 1}")
     else:
+        label_truck.config(text=f"Bil {truck_to_draw + 1}")
         truck_canvas.create_text(48, 255, text="Rester", font=("", "13"))
-
 
 
 # Draws the contents of the next or the previous truck, depending on which button has been pressed
@@ -472,12 +472,12 @@ def draw_arrangement(arrangement, canvas):
         draw_description(25, "0,8 ldm")
         brush_position += 32 - 1
     elif arrangement == (23090,):
-        y2 = y + 32
-        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=PALLET_COLORS["17080"])
+        y2 = y + 36
+        canvas.create_rectangle(0 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["23090"])
         draw_bracket(y, y2)
-        draw_description(10, "23090 x 1")
+        draw_description(10, "230x90 x 1")
         draw_description(25, "0,9 ldm")
-        brush_position += 32 - 1
+        brush_position += 36 - 1
 
 
 # Draws a representation of leftover pallets and their description on leftover_canvas

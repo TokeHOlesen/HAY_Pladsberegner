@@ -123,14 +123,14 @@ class GroupingProcessor:
 
     def get_lowest_loose_ldm(self) -> int:
         """Checks the total ldm value of loose pallets in every grouping and returns the lowest one."""
-        lowest_ldm = 65536
+        lowest_ldm = 16777216  # Arbitrary large number
         for grouping in self.groupings:
             lowest_ldm = grouping.loose_pallets_ldm if grouping.loose_pallets_ldm < lowest_ldm else lowest_ldm
         return lowest_ldm
 
     def get_lowest_arrangement_ldm(self) -> int:
         """Checks the total ldm value of arrangements in every grouping and returns the lowest one."""
-        lowest_ldm = 65536
+        lowest_ldm = 16777216  # Arbitrary large number
         for grouping in self.groupings:
             lowest_ldm = grouping.arrangements_ldm if grouping.arrangements_ldm < lowest_ldm else lowest_ldm
         return lowest_ldm

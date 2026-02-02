@@ -13,7 +13,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"HAY Pladsberegner {constants.VERSION}")
         self.setFixedSize(400, 668)
 
-        calc_result = calculate_load([100, 100, 100, 100, 100, 100, 0])
+        calc_result = calculate_load([0, 9, 12, 5, 0, 0, 0])
 
         truck_view_widget = TruckView()
         loose_pallets_view_widget = TruckView()
