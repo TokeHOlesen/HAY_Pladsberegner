@@ -3,6 +3,7 @@ from collections import Counter
 from grouping_processor_class import GroupingProcessor
 from truck_processor_class import TruckProcessor
 from truck_class import Truck
+from constants import DEFAULT_MAX_TRUCK_LDM
 
 
 @dataclass
@@ -18,13 +19,13 @@ class LoadCalculationResult:
     loose_pallets_ldm: int
 
 
-def calculate_load(pallets: list[int]) -> LoadCalculationResult:
+def calculate_load(pallets: list[int], max_ldm=DEFAULT_MAX_TRUCK_LDM) -> LoadCalculationResult:
     """
     Takes a list of 7 ints as an argument, corresponding to the number of the 7 pallet types.
     Returns a LoadCalculationResult object, containing all the relevant results.
     """
     grouping_processor = GroupingProcessor()
-    truck_processor = TruckProcessor()
+    truck_processor = TruckProcessor(max_ldm)
     grouping_processor.load_pallets(*pallets)
     grouping_processor.process_groupings()
     chosen_grouping = grouping_processor.best_grouping

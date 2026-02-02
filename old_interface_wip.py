@@ -180,7 +180,7 @@ def calculate_pallets():
     # Sets max ldm per truck
     set_target_ldm(entry_ldm.get())
 
-    calc_result = calculate_load(pallet_input)
+    calc_result = calculate_load(pallet_input, max_ldm=max_truck_ldm)
 
     # Data processing begins here
     start_button.config(state=DISABLED)

@@ -93,9 +93,10 @@ class TruckProcessor:
                     truck.add_pallet(120)
                     self.loose_pallets.remove(120)
         # Add more trucks if all the 120 pallets can't fit on existing ones
+        max_120_per_truck: int = self.max_ldm // PALLET_LDM_VALUES[120]
         while self.number_of_loose_120 > 1:
             self.add_truck()
-            number_to_add: int = min(33, self.number_of_loose_120)
+            number_to_add: int = min(max_120_per_truck, self.number_of_loose_120)
             self.last_truck.add_pallet(120, number_to_add)
             for i in range(number_to_add):
                 self.loose_pallets.remove(120)
