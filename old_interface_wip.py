@@ -99,6 +99,7 @@ def reset_all(mode):
     copy_text_button.config(state=DISABLED)
     print_text_button.config(state=DISABLED)
     save_text_button.config(state=DISABLED)
+    save_pdf_button.config(state=DISABLED)
 
     if mode == "full":
         for entry in entry_boxes:
@@ -230,6 +231,7 @@ def calculate_pallets():
     copy_text_button.config(state=NORMAL)
     print_text_button.config(state=NORMAL)
     save_text_button.config(state=NORMAL)
+    save_pdf_button.config(state=NORMAL)
 
     if calc_result.number_of_loose_pallets > 0:
         brush_position = 20
@@ -557,6 +559,10 @@ def save_text_output():
         t_f.write(text_output.get(6.0, "end-10c"))
 
 
+def save_pdf_file():
+    ...
+
+
 def ask_if_really_quit():
     quit_response = messagebox.askyesno("HAY Pladsberegner", "Skal programmet lukkes?")
     if quit_response:
@@ -653,6 +659,7 @@ text_output.config(state=DISABLED)
 copy_text_button = Button(window, text="Kopiér", width=10, state=DISABLED, command=copy_text_output)
 print_text_button = Button(window, text="Print", width=10, state=DISABLED, command=print_text_output)
 save_text_button = Button(window, text="Gem", width=10, state=DISABLED, command=save_text_output)
+save_pdf_button = Button(window, text="Gem PDF", width=10, state=DISABLED, command=save_pdf_file)
 
 # Placement of GUI elements
 
@@ -677,6 +684,7 @@ text_output.place(x=16, y=602)
 copy_text_button.place(x=16, y=782)
 print_text_button.place(x=108, y=782)
 save_text_button.place(x=200, y=782)
+save_pdf_button.place(x=292, y=782)
 
 # Draws empty truck rectangles
 draw_truck_rectangle(truck_canvas)
