@@ -147,8 +147,6 @@ def threaded_calculate_pallets(_):  # CHECK - Irrelevant
 
 # Main function
 def calculate_pallets():
-    status_label.config(text="Klar.")
-
     global truck_to_draw
     global calc_result
     global brush_position
@@ -180,15 +178,14 @@ def calculate_pallets():
     # Sets max ldm per truck
     set_target_ldm(entry_ldm.get())
 
+    status_label.config(text="Arbejder...")
     calc_result = calculate_load(pallet_input, max_ldm=max_truck_ldm)
+    status_label.config(text="Færdig.")
 
     # Data processing begins here
     start_button.config(state=DISABLED)
     text_output.config(state=NORMAL)
 
-    progress_bar["value"] = 0
-
-    status_label.config(text="Færdig.")
 
     # Text output of truck contents
 
@@ -618,8 +615,6 @@ for e in range(7):
 start_button = Button(window, text="Start", width=10, command=partial(threaded_calculate_pallets, "Null"))
 start_button.bind("<Return>", threaded_calculate_pallets)
 
-progress_bar = ttk.Progressbar(window, length=116)
-
 status_label = Label(window, text="Klar.")
 
 target_ldm_frame = Frame(window)
@@ -662,9 +657,8 @@ save_text_button = Button(window, text="Gem", width=10, state=DISABLED, command=
 # Placement of GUI elements
 
 entry_frame.place(x=4, y=32)
-start_button.place(x=34, y=246)
-progress_bar.place(x=16, y=289)
-status_label.place(x=16, y=319)
+start_button.place(x=34, y=232)
+status_label.place(x=16, y=280)
 target_ldm_frame.place(x=4, y=355)
 reset_button.place(x=34, y=405)
 no_of_trucks_label.place(x=16, y=468)
