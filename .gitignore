@@ -1,7 +1,5 @@
-.ico.spec
 main.spec
 build/
 .idea/
 __pycache__/
 dist/
-old_interface_wip.spec
