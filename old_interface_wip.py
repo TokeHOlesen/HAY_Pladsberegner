@@ -1,12 +1,14 @@
 # Optimized for Python 3.11
 # ver. 0.9.1.9b / 06-sep-2023
 
+import sys
 from tkinter import *
 from tkinter import ttk, scrolledtext, messagebox
 from tkinter.filedialog import asksaveasfile
 from functools import partial
 from threading import Thread
 from os import path, startfile, remove
+from PyQt6.QtWidgets import QApplication
 
 from constants import *
 from load_calculator import calculate_load
@@ -463,13 +465,6 @@ def draw_arrangement(arrangement, canvas):
         draw_description(31, "120x80 x 2")
         draw_description(46, "1,6 ldm")
         brush_position += 64 - 1
-    elif arrangement == (17080,):
-        y2 = y + 32
-        canvas.create_rectangle(0 + 2, y + 2, 68, y2 - 1, fill=PALLET_COLORS["17080"])
-        draw_bracket(y, y2)
-        draw_description(10, "170x80 x 1")
-        draw_description(25, "0,8 ldm")
-        brush_position += 32 - 1
     elif arrangement == (23090,):
         y2 = y + 36
         canvas.create_rectangle(0 + 2, y + 2, 96, y2 - 1, fill=PALLET_COLORS["23090"])
@@ -560,7 +555,10 @@ def save_text_output():
 
 
 def save_pdf_file():
-    ...
+    pdf_path = asksaveasfile(defaultextension=".pdf", filetypes=[("Portable Document Format", "*.pdf"), ("Alle filer", "*.*")])
+    pdf_title = pdf_path.name.split("/")[-1][:-4]
+    dummy_app = QApplication(sys.argv)
+    generate_pdf(calc_result, pdf_title, pdf_path.name)
 
 
 def ask_if_really_quit():
