@@ -1,5 +1,12 @@
 # Optimized for Python 3.11
-# ver. 0.9.1.9b / 06-sep-2023
+# ver. 0.9.9 / 03-feb-2026
+
+# HERE BE DRAGONS!
+
+# This is old, bad code made even worse by being forced to interface with the new backend.
+# Until a new GUI is finished, this provides all the necessary functionality, but, for the love of God,
+# don't build upon this. Fix a bug if need be, but don't add features and don't waste time cleaning this mess up.
+# This is a highly temporary solution until the new Qt-based GUI is ready.
 
 import sys
 from tkinter import *
@@ -188,7 +195,6 @@ def calculate_pallets():
     # Data processing begins here
     start_button.config(state=DISABLED)
     text_output.config(state=NORMAL)
-
 
     # Text output of truck contents
 
@@ -570,7 +576,7 @@ def ask_if_really_quit():
 # GUI starts here
 
 window = Tk()
-window.title("HAY Pladsberegner 0.9.1.9b")
+window.title("HAY Pladsberegner 0.9.9")
 window.geometry("572x820+256+64")
 window.resizable(False, False)
 window.protocol('WM_DELETE_WINDOW', ask_if_really_quit)
