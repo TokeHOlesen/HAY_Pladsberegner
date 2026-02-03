@@ -2,3 +2,6 @@
 main.spec
 build/
 .idea/
+__pychace__/
+dist/
+old_interface_wip.spec
